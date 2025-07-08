@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rucher-École du VAR - La passion des abeilles</title>
+    <meta name="description" content="Rejoignez notre communauté d'apiculteurs passionnés. Cours, entraide et protection des abeilles dans le VAR.">
+    <meta name="keywords" content="apiculture, abeilles, rucher, école, var, essaim, miel, formation">
+    
+    <!-- Favicon (exemple, à remplacer par votre logo) -->
+    <link rel="icon" href="Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <!-- AOS (Animate On Scroll) CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <!-- Configuration personnalisée de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wheat': '#E8D7A8',
+                        'raw': '#816557',
+                        'seal': '#561F04',
+                        'gamboge': '#F6A01F',
+                        'tigers': '#BA6E1F',
+                        // Alias pour garantir la compatibilité avec les classes déjà utilisées
+                        'miel': '#F6A01F',
+                        'fond-clair': '#F5F5F5',
+                    },
+                    fontFamily: {
+                        'titre': ['Montserrat', 'sans-serif'],
+                        'corps': ['Lato', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Vous pouvez ajouter des styles personnalisés ici */
+
+        /* Animation douce de zoom pour le background du hero */
+        @keyframes bgPan {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .hero-bg {
+            animation: bgPan 20s ease-in-out infinite alternate;
+        }
+
+        /* Dot de miel pour le curseur */
+        .cursor-dot {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #F6A01F;
+            pointer-events: none;
+            z-index: 9999;
+            animation: trail 0.8s linear forwards;
+        }
+
+        @keyframes trail {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="font-corps bg-white text-gray-800">
+
+    <!-- 1. Navigation Principale (Header) -->
+    <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center font-titre text-2xl font-bold">
+                <img src="Sans-titrelogo-seul-removebg-preview.png" alt="Logo Rucher-École" class="h-12 w-auto mr-3">
+                <a href="index.html">Rucher-École</a>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#accueil" class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
+                <a href="formulaires.html" class="text-gray-600 hover:text-miel transition-colors">Formulaires & Fiches</a>
+                <a href="#galerie" class="text-gray-600 hover:text-miel transition-colors">Galerie photo</a>
+                <a href="planning.html" class="text-gray-600 hover:text-miel transition-colors">Planning</a>
+                <a href="#contact" class="text-gray-600 hover:text-miel transition-colors">Contact</a>
+            </div>
+            <a href="#adhesion" class="hidden md:block bg-miel text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors">
+                Devenir Adhérent
+            </a>
+            <!-- Menu mobile (icône) -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Menu mobile (déroulant) -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#accueil" class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+            <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires & Fiches</a>
+            <a href="#galerie" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
+            <a href="planning.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
+            <a href="#contact" class="block py-2 px-4 text-sm hover:bg-fond-clair">Contact</a>
+            <a href="#adhesion" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>
+        </div>
+    </header>
+
+    <!-- Pop-up Signaler un essaim -->
+    <div class="fixed bottom-5 right-5 z-50">
+        <a href="urgence.html" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg animate-bounce">
+            Signalez un essaim !
+        </a>
+    </div>
+
+    <main>
+        <!-- 2. Section d'accueil ("Hero Section") -->
+        <section id="accueil" class="relative h-screen flex items-center justify-center text-center text-white bg-gray-800">
+            <!-- Image d'arrière-plan -->
+            <div class="hero-bg absolute inset-0 bg-cover bg-center z-0" style="background-image: url('imagebackground.png');"></div>
+            <!-- Assombrissement de l'image -->
+            <div class="absolute inset-0 bg-seal/60 z-10"></div>
+            <!-- Contenu -->
+            <div class="relative z-20 px-4 reveal visible">
+                <h1 class="font-titre text-4xl md:text-6xl font-bold leading-tight">La passion des abeilles, un savoir à partager.</h1>
+                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto">Rucher-école du VAR : rejoignez une communauté engagée pour la protection des pollinisateurs.</p>
+                <a href="#adhesion" class="mt-8 inline-block bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition-colors text-lg">
+                    Devenir Adhérent
+                </a>
+            </div>
+            <!-- Flèche d'invitation au scroll -->
+            <div class="absolute bottom-10 z-20">
+                <a href="#qui-sommes-nous">
+                    <svg class="w-8 h-8 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- 3. Section "Qui sommes-nous ?" -->
+        <section id="qui-sommes-nous" class="py-20 bg-white relative overflow-hidden">
+            <!-- Texture ruche en arrière-plan -->
+            <div class="absolute inset-0 bg-[url('honeycomb.png')] bg-repeat opacity-10 pointer-events-none"></div>
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <h2 class="font-titre text-3xl font-bold mb-4">Qui sommes-nous ?</h2>
+                    <p class="mb-4 text-gray-600">Notre association loi 1901 a pour but de développer la connaissance de l'apiculture et de participer à la protection des abeilles, sentinelles de notre environnement.</p>
+                    <p class="text-gray-600">Le rucher-école du VAR est un lieu d'échange et de formation ouvert à tous, des néophytes curieux aux apiculteurs confirmés souhaitant parfaire leurs techniques.</p>
+                </div>
+                <div class="reveal">
+                    <img src="saintraphresize.jpg" alt="Vue aérienne de Saint-Raphaël et du rucher" class="rounded-lg shadow-xl w-full h-auto">
+                </div>
+            </div>
+        </section>
+        
+        <!-- 4. Section "Les Avantages Adhérents" -->
+        <section id="avantages" class="py-20 bg-gradient-to-r from-wheat/40 to-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="font-titre text-3xl font-bold mb-12 reveal">Pourquoi nous rejoindre ?</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Avantage 1 -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg reveal">
+                        <div class="text-miel mb-4">
+                            <!-- Icône SVG placeholder -->
+                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-9.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-9.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20M1 14v5h22v-5"></path></svg>
+                        </div>
+                        <h3 class="font-titre text-xl font-bold mb-2">Accès aux Cours</h3>
+                        <p class="text-gray-600">Profitez de nos formations pour débutants et confirmés.</p>
+                    </div>
+                    <!-- Avantage 2 -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg reveal" style="transition-delay: 100ms;">
+                        <div class="text-miel mb-4">
+                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h3 class="font-titre text-xl font-bold mb-2">Miellerie Partagée</h3>
+                        <p class="text-gray-600">Utilisez notre équipement professionnel pour extraire votre miel.</p>
+                    </div>
+                    <!-- Avantage 3 -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg reveal" style="transition-delay: 200ms;">
+                        <div class="text-miel mb-4">
+                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h5m-5 4h5m-5-4h.01M9 7h.01M13 7h.01M13 11h.01M13 15h.01M13 19h.01M9 11h.01M9 15h.01M9 19h.01"></path></svg>
+                        </div>
+                        <h3 class="font-titre text-xl font-bold mb-2">Commandes Groupées</h3>
+                        <p class="text-gray-600">Bénéficiez de tarifs préférentiels sur le matériel apicole.</p>
+                    </div>
+                    <!-- Avantage 4 -->
+                    <div class="bg-white p-8 rounded-lg shadow-lg reveal" style="transition-delay: 300ms;">
+                        <div class="text-miel mb-4">
+                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        </div>
+                        <h3 class="font-titre text-xl font-bold mb-2">Entraide & Communauté</h3>
+                        <p class="text-gray-600">Partagez vos expériences lors de nos réunions et événements.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Section "Adhésion 2025" -->
+        <section id="adhesion" class="py-20 bg-wheat/10">
+            <div class="container mx-auto px-6 text-center">
+                <div class="max-w-2xl mx-auto bg-fond-clair p-10 rounded-xl shadow-inner reveal">
+                    <h2 class="font-titre text-3xl font-bold">Adhérez pour la saison 2025</h2>
+                    <p class="text-2xl font-bold text-miel my-4">Cotisation : 25 €</p>
+                    <p class="text-gray-600 mb-6">Tarif réduit à <span class="font-bold">15 €</span> pour toute adhésion avant le 15 mars !</p>
+                    <a href="https://v-assets.cdnsw.com/dl/Root/gb2ho-COTISATION-mars-2025-RE.pdf" class="inline-block bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition-colors text-lg" target="_blank" download>
+                        📥 Télécharger le bulletin d'adhésion
+                    </a>
+                    <p class="mt-6 text-sm text-gray-500">
+                        Curieux ? <a href="#" class="text-miel underline hover:text-yellow-600 font-bold">QUIZZ ABEILLES</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Section "Urgence Essaim" -->
+        <section id="urgence-essaim" class="bg-red-50 py-10">
+            <div class="container mx-auto px-6 text-center reveal">
+                <h3 class="font-titre text-2xl font-bold text-red-800">SIGNALER UN ESSAIM</h3>
+                <p class="text-red-700 mt-2">N'intervenez pas vous-même. Contactez notre service de récupération gratuit.</p>
+                <a href="urgence.html" class="mt-4 inline-block text-2xl font-bold text-red-800 border-2 border-red-700 rounded-full px-6 py-3 hover:bg-red-100 transition-colors">
+                    📞 06 64 92 52 21
+                </a>
+            </div>
+        </section>
+
+        <!-- 7. Aperçu de la Galerie -->
+        <section id="galerie" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="font-titre text-3xl font-bold text-center mb-12 reveal">La vie du rucher en images</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="group relative overflow-hidden rounded-lg reveal">
+                        <img src="https://picsum.photos/400/500?image=106" alt="Apiculteur au travail" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                            <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Atelier Pédagogique</h4>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 100ms;">
+                        <img src="https://picsum.photos/400/500?image=211" alt="Récolte du miel" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                            <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Récolte du Miel</h4>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 200ms;">
+                        <img src="https://picsum.photos/400/500?image=239" alt="Une ruche" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                            <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Vie du Rucher</h4>
+                        </div>
+                    </div>
+                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 300ms;">
+                        <img src="https://picsum.photos/400/500?image=244" alt="Fleur et abeille" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                            <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Notre Environnement</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                     <a href="#" class="inline-block bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition-colors text-lg">
+                        Voir toute la galerie
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Carte Google Maps -->
+        <section id="carte" class="w-full h-96">
+            <iframe class="w-full h-full border-0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=43.443153,6.797675&hl=fr&z=14&output=embed"></iframe>
+        </section>
+
+    </main>
+
+    <!-- Pied de Page (Footer) -->
+    <footer id="contact" class="bg-gray-900 text-white">
+        <div class="container mx-auto px-6 py-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Colonne 1: Logo et Association -->
+                <div>
+                    <h3 class="font-titre text-xl font-bold mb-2">Rucher-École du VAR</h3>
+                    <p class="text-gray-400">RUCHER ECOLE DU VAR<br/>Association loi 1901</p>
+                    <p class="text-gray-400 mt-2">2500 Boulevard Jacques Baudino<br/>83700 Saint-Raphaël</p>
+                </div>
+
+                <!-- Colonne 2: Contact -->
+                <div>
+                    <h3 class="font-titre text-xl font-bold mb-2">Contact</h3>
+                    <p class="text-gray-400">Adresse : 2500 Boulevard Jacques Baudino, 83700 Saint-Raphaël</p>
+                    <p class="text-gray-400">Email : <a href="mailto:rucher.ecole83700@gmail.com" class="hover:text-miel">rucher.ecole83700@gmail.com</a></p>
+                    <div class="mt-2 bg-red-100/10 p-2 rounded">
+                        <p class="text-gray-300 font-bold">Urgence essaim :</p>
+                        <a href="tel:0664925221" class="text-white text-lg font-bold hover:text-miel">06 64 92 52 21</a>
+                    </div>
+                </div>
+
+                <!-- Colonne 3: Liens Utiles -->
+                <div>
+                    <h3 class="font-titre text-xl font-bold mb-2">Liens Utiles</h3>
+                    <ul class="text-gray-400 space-y-2">
+                        <li><a href="#accueil" class="hover:text-miel">Accueil</a></li>
+                        <li><a href="formulaires.html" class="hover:text-miel">Ressources</a></li>
+                        <li><a href="#galerie" class="hover:text-miel">Galerie</a></li>
+                        <li><a href="#" class="hover:text-miel">Statuts & Règlement</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-6 text-center text-gray-500">
+                <p>&copy; 2025 Rucher-École de Saint-Raphaël | <a href="#" class="hover:text-miel">Mentions Légales</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script pour les animations et le menu mobile -->
+    <script>
+        // Menu mobile
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+    <!-- AOS (Animate On Scroll) JS -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Attribuer automatiquement l'animation fade-up à tous les éléments avec la classe "reveal"
+        document.querySelectorAll('.reveal').forEach((el, idx) => {
+            el.setAttribute('data-aos', 'fade-up');
+            el.setAttribute('data-aos-delay', idx * 80); // décalage progressif
+        });
+
+        // Initialiser AOS
+        AOS.init({
+            once: true,
+            duration: 800,
+            easing: 'ease-out-quad'
+        });
+
+        // Effet de traînée de miel pour le curseur
+        document.addEventListener('mousemove', (e) => {
+            const dot = document.createElement('span');
+            dot.classList.add('cursor-dot');
+            dot.style.left = `${e.clientX}px`;
+            dot.style.top = `${e.clientY}px`;
+            document.body.appendChild(dot);
+            dot.addEventListener('animationend', () => dot.remove());
+        });
+    </script>
+</body>
+</html> 

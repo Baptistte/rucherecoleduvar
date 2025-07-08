@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signaler un Essaim | Rucher École</title>
+    <meta name="description" content="Service gratuit de signalement et récupération d'essaims d’abeilles par le Rucher-École du Var, Saint-Raphaël.">
+    <meta name="keywords" content="essaim, abeilles, urgence essaim, récupération, apiculture, Var, Saint-Raphaël">
+    <link rel="icon" href="Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <!-- Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8',
+                        raw: '#816557',
+                        seal: '#561F04',
+                        gamboge: '#F6A01F',
+                        tigers: '#BA6E1F'
+                    },
+                    fontFamily: {
+                        titre: ['Montserrat', 'sans-serif'],
+                        corps: ['Lato', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-corps text-white bg-gradient-to-br from-red-700 via-seal to-red-900 min-h-screen flex flex-col">
+
+    <!-- Navbar réutilisée -->
+    <header class="bg-white/80 backdrop-blur-md shadow-md fixed top-0 inset-x-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center font-titre text-2xl font-bold"><img src="Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-12 w-auto mr-3"><a href="index.html">Rucher-École</a></div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html#accueil" class="text-gray-600 hover:text-gamboge transition-colors">Accueil</a>
+                <a href="formulaires.html" class="text-gray-600 hover:text-gamboge transition-colors">Formulaires & Fiches</a>
+                <a href="index.html#galerie" class="text-gray-600 hover:text-gamboge transition-colors">Galerie photo</a>
+                <a href="planning.html" class="text-gray-600 hover:text-gamboge transition-colors">Planning</a>
+                <a href="index.html#contact" class="text-gray-600 hover:text-gamboge transition-colors">Contact</a>
+            </div>
+            <a href="index.html#adhesion" class="hidden md:block bg-gamboge text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors">Devenir Adhérent</a>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/90">
+            <a href="index.html#accueil" class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+            <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires & Fiches</a>
+            <a href="index.html#galerie" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
+            <a href="planning.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
+            <a href="index.html#contact" class="block py-2 px-4 text-sm hover:bg-fond-clair">Contact</a>
+            <a href="index.html#adhesion" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>
+        </div>
+    </header>
+
+    <!-- Pop-up essaim -->
+    <div class="fixed bottom-5 right-5 z-50">
+        <a href="urgence.html" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg animate-bounce">Signalez un essaim !</a>
+    </div>
+
+    <main class="flex-1 flex items-center justify-center pt-24">
+        <div class="text-center px-6">
+            <h1 class="font-titre text-4xl md:text-5xl font-bold mb-6 animate-pulse">SIGNALER UN ESSAIM</h1>
+            <p class="mb-4 text-lg md:text-xl">N'intervenez pas vous-même, nous intervenons gratuitement et rapidement.</p>
+            <a href="tel:0664925221" class="inline-block text-3xl md:text-4xl font-extrabold text-gamboge bg-white rounded-full py-4 px-10 shadow-xl hover:scale-105 transition-transform">📞 06&nbsp;64&nbsp;92&nbsp;52&nbsp;21</a>
+            <p class="mt-8 text-sm opacity-70">Disponible 7j/7 • Rucher École du Var</p>
+        </div>
+    </main>
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    </script>
+</body>
+</html> 

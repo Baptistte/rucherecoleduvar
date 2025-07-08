@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaires & Fiches Techniques | Rucher École</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <!-- Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8',
+                        raw: '#816557',
+                        seal: '#561F04',
+                        gamboge: '#F6A01F',
+                        tigers: '#BA6E1F'
+                    },
+                    fontFamily: {
+                        titre: ['Montserrat', 'sans-serif'],
+                        corps: ['Lato', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <meta name="description" content="Téléchargez formulaires d’adhésion, statuts, règlements et fiches techniques apicoles du Rucher-École du Var.">
+    <meta name="keywords" content="formulaires, fiches techniques, apiculture, rucher école, statuts, règlement, Var">
+    <link rel="icon" href="Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+</head>
+<body class="font-corps bg-gradient-to-br from-wheat via-raw/10 to-white min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-white/80 backdrop-blur-md shadow-md fixed top-0 inset-x-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center font-titre text-2xl font-bold"><img src="Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-12 w-auto mr-3"><a href="index.html">Rucher-École</a></div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html#accueil" class="text-gray-600 hover:text-gamboge transition-colors">Accueil</a>
+                <a href="formulaires.html" class="text-gray-600 hover:text-gamboge transition-colors">Formulaires & Fiches</a>
+                <a href="index.html#galerie" class="text-gray-600 hover:text-gamboge transition-colors">Galerie photo</a>
+                <a href="planning.html" class="text-gray-600 hover:text-gamboge transition-colors">Planning</a>
+                <a href="index.html#contact" class="text-gray-600 hover:text-gamboge transition-colors">Contact</a>
+            </div>
+            <a href="index.html#adhesion" class="hidden md:block bg-gamboge text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors">Devenir Adhérent</a>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Menu mobile -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/90">
+            <a href="index.html#accueil" class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+            <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires & Fiches</a>
+            <a href="index.html#galerie" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
+            <a href="planning.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
+            <a href="index.html#contact" class="block py-2 px-4 text-sm hover:bg-fond-clair">Contact</a>
+            <a href="index.html#adhesion" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>
+        </div>
+    </header>
+
+    <!-- Popup essaim -->
+    <div class="fixed bottom-5 right-5 z-50">
+        <a href="urgence.html" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg animate-bounce">Signalez un essaim !</a>
+    </div>
+
+    <!-- En-tête de page -->
+    <header class="text-center py-6 bg-gamboge text-white shadow-lg mt-16">
+        <h1 class="font-titre text-3xl md:text-4xl font-bold">Formulaires & Fiches Techniques</h1>
+        <p class="mt-1 text-sm opacity-90">Tous les documents utiles du Rucher École du Var</p>
+    </header>
+
+    <main class="flex-1 pb-12 pt-8 px-4 md:px-8">
+        <div class="max-w-5xl mx-auto space-y-12">
+            <!-- Bloc Documents administratifs -->
+            <section>
+                <h2 class="font-titre text-2xl font-bold mb-4 text-seal">Documents administratifs & Formulaires</h2>
+                <ul class="list-disc pl-6 space-y-2 text-gamboge">
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/gc97k-Charte-recuperation-essaim.pdf" target="_blank" class="underline hover:text-tigers">Module présenté lors de la réunion du 10&nbsp;février</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/d1aa0-STATUTS_DU_RUCHER_ECOLE_DU_VAR.pdf" target="_blank" class="underline hover:text-tigers">Statuts du Rucher École du Var</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/d02z3-Rucher_Ecole_du_Var_R_I_.docx" target="_blank" class="underline hover:text-tigers">Règlement Intérieur – Rucher École du Var</a></li>
+                    <li><a href="http://mesdemarches.agriculture.gouv.fr/demarches/exploitation-agricole/obtenir-un-droit-une-autorisation/article/declarer-la-detention-et-l-294" target="_blank" class="underline hover:text-tigers">Déclaration de ruches</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/gc97k-Charte-recuperation-essaim.pdf" target="_blank" class="underline hover:text-tigers">Charte de récupération d'essaim</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/ez77n-RI-Cous.pdf" target="_blank" class="underline hover:text-tigers">Règlement Rucher des Cous</a></li>
+                </ul>
+            </section>
+
+            <!-- Bloc Fiches techniques -->
+            <section>
+                <h2 class="font-titre text-2xl font-bold mb-4 text-seal">Fiches Techniques</h2>
+                <ul class="list-disc pl-6 space-y-2 text-gamboge">
+                    <li><a href="https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&cad=rja&uact=8&ved=0CDQQFjACahUKEwjll7KtoqPIAhVFOxoKHZjPCFk&url=http%3A%2F%2Fwww.var.gouv.fr%2FIMG%2Fpdf%2Finformations_apicoles_2014_cle1b5158.pdf&usg=AFQjCNF3Xqkck4Uojg1mTXOmS14c_eRuQA" target="_blank" class="underline hover:text-tigers">Distances à respecter pour un emplacement de ruches (Var&nbsp;–&nbsp;83)</a></li>
+                    <li><a href="https://gdsa83.fr/wp-content/uploads/2015/08/fiche-technique-m%C3%A9dicament-83.pdf" target="_blank" class="underline hover:text-tigers">Lutte contre le varroa – traitement de fin de saison apicole</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/e47lw-Lexique.pdf" target="_blank" class="underline hover:text-tigers">Lexique</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/ez77u-Precautions-pour-un-bon-hivernage.pdf" target="_blank" class="underline hover:text-tigers">Précautions pour un bon hivernage</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/cyfyn-traitement_d_hiver.docx" target="_blank" class="underline hover:text-tigers">Traitement d'hiver</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/czcx1-Analyse_au_refractometre.docx" target="_blank" class="underline hover:text-tigers">Analyse au réfractomètre</a></li>
+                    <li><a href="https://youtu.be/HLiAoIvFtCE" target="_blank" class="underline hover:text-tigers">Vidéo – Utilisation du gaufrier</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/f68h5-Procedure-pour-gaufrage-de-la-cire.pdf" target="_blank" class="underline hover:text-tigers">Notice d'utilisation du gaufrier</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/ez743-demain-je-serai-apiculteur.pdf" target="_blank" class="underline hover:text-tigers">Demain, je serai apiculteur</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/e6147-Traitement_des_cires_noires.pdf" target="_blank" class="underline hover:text-tigers">Traitement des cires noires</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/g4g85-Seuil-taux-d-infestation-des-varroas.png" target="_blank" class="underline hover:text-tigers">Seuil d'infestation des varroas dans la ruche</a></li>
+                    <li><a href="https://v-assets.cdnsw.com/fs/Root/gcxvo-Muselieres-faites-par-J-CLAUDIN.pdf" target="_blank" class="underline hover:text-tigers">Tuto muselière</a></li>
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 text-sm text-raw bg-wheat/40">
+        <button onclick="history.back()" class="underline hover:text-gamboge">← Retour au site</button>
+    </footer>
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    </script>
+</body>
+</html> 
