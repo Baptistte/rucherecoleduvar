@@ -110,7 +110,7 @@ Dans les settings Netlify, ajoutez :
 ```
 NEON_DATABASE_URL=postgresql://username:password@hostname/database?sslmode=require
 JWT_SECRET=votre-secret-key-ultra-securise-256-bits-minimum
-ADMIN_EMAIL=rucher.ecole83700@gmail.com
+ADMIN_EMAIL=rucher.ecole@gmail.com
 ADMIN_PASSWORD_HASH=$2a$10$votrehashbcryptdumotdepasseadmin
 ```
 

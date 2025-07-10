@@ -1,0 +1,10 @@
+# Autoriser tous les robots à crawler le site
+User-agent: *
+Allow: /
+
+# Bloquer l'accès aux pages sensibles ou non pertinentes pour le SEO
+Disallow: /gestion-ne6rshum9w-9t1fhqm3x7.html
+Disallow: /netlify/
+
+# Chemin vers le sitemap
+Sitemap: https://www.rucher-ecole-var.fr/sitemap.xml 

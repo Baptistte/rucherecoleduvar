@@ -2,7 +2,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
-
+.env.example
 # Fichiers de log
 *.log
 npm-debug.log*
