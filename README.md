@@ -107,12 +107,7 @@ Site web moderne et responsive pour le Rucher École du Var, construit avec HTML
 
 ### 3. Configuration des variables d'environnement
 Dans les settings Netlify, ajoutez :
-```
-NEON_DATABASE_URL=postgresql://username:password@hostname/database?sslmode=require
-JWT_SECRET=votre-secret-key-ultra-securise-256-bits-minimum
-ADMIN_EMAIL=rucher.ecole@gmail.com
-ADMIN_PASSWORD_HASH=$2a$10$votrehashbcryptdumotdepasseadmin
-```
+
 
 ### 4. Génération du hash du mot de passe admin
 ```bash
