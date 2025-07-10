@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration | Rucher École</title>
+    <meta name="description" content="Panel d'administration du Rucher-École du Var pour gérer le calendrier et les documents.">
+    <link rel="icon" href="Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8',
+                        raw: '#816557',
+                        seal: '#561F04',
+                        gamboge: '#F6A01F',
+                        tigers: '#BA6E1F',
+                        'fond-clair': '#F5F5F5'
+                    },
+                    fontFamily: {
+                        gotham: ['Gotham', 'sans-serif'],
+                        titre: ['Gotham', 'sans-serif'],
+                        corps: ['Gotham', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @font-face {
+            font-family: 'Gotham';
+            src: url('assets/fonts/Gotham-Medium.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        /* Scrollbar personnalisée jaune miel */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #F6A01F 0%, #BA6E1F 100%);
+            border-radius: 6px;
+            border: 2px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #E6901F 0%, #AA5E1F 100%);
+        }
+
+        /* Pour Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #F6A01F #f1f1f1;
+        }
+    </style>
+</head>
+<body class="font-gotham bg-fond-clair min-h-screen">
+
+    <!-- Navigation -->
+    <header class="bg-white/80 backdrop-blur-md shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center font-titre text-2xl font-bold">
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3">
+                <a href="index.html">Administration</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="userEmail" class="text-gray-600"></span>
+                <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Déconnexion
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Page de connexion -->
+    <div id="loginPage" class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+            <h1 class="font-titre text-2xl font-bold mb-6 text-center">Connexion Admin</h1>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-gamboge">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
+                    <input type="password" id="password" required autocomplete="current-password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-gamboge">
+                </div>
+                <button type="submit" class="w-full bg-gamboge text-black font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors">
+                    Se connecter
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-red-600 text-sm hidden"></div>
+        </div>
+    </div>
+
+    <!-- Panel d'administration -->
+    <div id="adminPanel" class="hidden">
+        <div class="container mx-auto px-6 py-8">
+            <h1 class="font-titre text-3xl font-bold mb-8">Panel d'Administration</h1>
+            
+            <!-- Onglets -->
+            <div class="mb-8">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8">
+                        <button class="tab-btn active py-2 px-1 border-b-2 border-gamboge text-gamboge font-medium" data-tab="calendar">
+                            Calendrier
+                        </button>
+                        <button class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="documents">
+                            Documents
+                        </button>
+                        <button class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="photos">
+                            Photos
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Section Calendrier -->
+            <div id="calendarTab" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-titre text-2xl font-bold">Gestion du Calendrier</h2>
+                    <button id="addEventBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Ajouter un événement
+                    </button>
+                </div>
+                <div id="calendarList" class="space-y-4"></div>
+            </div>
+
+            <!-- Section Documents -->
+            <div id="documentsTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-titre text-2xl font-bold">Gestion des Documents</h2>
+                    <button id="addDocBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Ajouter un document
+                    </button>
+                </div>
+                <div id="documentsList" class="space-y-4"></div>
+            </div>
+
+            <!-- Section Photos -->
+            <div id="photosTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-titre text-2xl font-bold">Gestion de la Galerie Photo</h2>
+                    <button id="addPhotoBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Ajouter une photo
+                    </button>
+                </div>
+                <div id="photosList" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un événement -->
+    <div id="eventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="font-titre text-xl font-bold mb-4">Événement</h3>
+            <form id="eventForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Date & Horaires</label>
+                    <input type="text" id="eventDate" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Théorie</label>
+                    <input type="text" id="eventTheory" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Activités prévues</label>
+                    <input type="text" id="eventActivities" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelEventBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button type="submit" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Sauvegarder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un document -->
+    <div id="docModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="font-titre text-xl font-bold mb-4">Document</h3>
+            <form id="docForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Titre</label>
+                    <input type="text" id="docTitle" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">URL</label>
+                    <input type="url" id="docUrl" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Catégorie</label>
+                    <select id="docCategory" required class="w-full px-3 py-2 border rounded-lg">
+                        <option value="admin">Documents administratifs</option>
+                        <option value="technique">Fiches Techniques</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelDocBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button type="submit" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Sauvegarder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une photo -->
+    <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-titre text-xl font-bold mb-4">Photo</h3>
+            <form id="photoForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Titre</label>
+                    <input type="text" id="photoTitle" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                
+                <!-- Section upload ou URL -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Méthode d'ajout</label>
+                    <div class="flex space-x-4 mb-3">
+                        <label class="flex items-center">
+                            <input type="radio" name="uploadMethod" value="file" checked class="mr-2">
+                            <span>Uploader un fichier</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="uploadMethod" value="url" class="mr-2">
+                            <span>URL d'image</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Upload de fichier -->
+                <div id="fileUploadSection" class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Sélectionner un fichier image</label>
+                    <input type="file" id="photoFile" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
+                    <p class="text-xs text-gray-500 mt-1">Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)</p>
+                    
+                    <!-- Aperçu de l'image -->
+                    <div id="imagePreview" class="mt-3 hidden">
+                        <img id="previewImg" src="" alt="Aperçu" class="max-w-full h-32 object-cover rounded border">
+                        <p id="fileInfo" class="text-xs text-gray-600 mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- URL d'image -->
+                <div id="urlSection" class="mb-4 hidden">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">URL de l'image</label>
+                    <input type="url" id="photoUrl" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Description (optionnelle)</label>
+                    <textarea id="photoDescription" class="w-full px-3 py-2 border rounded-lg h-20"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Catégorie</label>
+                    <select id="photoCategory" required class="w-full px-3 py-2 border rounded-lg">
+                        <option value="apiculture">Apiculture</option>
+                        <option value="formation">Formation</option>
+                        <option value="evenements">Événements</option>
+                        <option value="rucher">Rucher</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelPhotoBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button type="submit" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                        Sauvegarder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let authToken = localStorage.getItem('authToken');
+        let editingEventId = null;
+        let editingDocId = null;
+        let editingPhotoId = null;
+
+        // Éléments DOM
+        const loginPage = document.getElementById('loginPage');
+        const adminPanel = document.getElementById('adminPanel');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const userEmail = document.getElementById('userEmail');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // API Helpers
+        const API_BASE = '/.netlify/functions';
+
+        const apiCall = async (endpoint, options = {}) => {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (authToken) {
+                headers.Authorization = `Bearer ${authToken}`;
+            }
+
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            return response.json();
+        };
+
+        // Vérifier l'authentification au chargement
+        const checkAuth = async () => {
+            if (!authToken) {
+                showLoginPage();
+                return;
+            }
+
+            try {
+                const result = await apiCall('/auth', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'verify', token: authToken })
+                });
+
+                if (result.valid) {
+                    currentUser = result.user;
+                    showAdminPanel();
+                } else {
+                    localStorage.removeItem('authToken');
+                    authToken = null;
+                    showLoginPage();
+                }
+            } catch (error) {
+                localStorage.removeItem('authToken');
+                authToken = null;
+                showLoginPage();
+            }
+        };
+
+        const showLoginPage = () => {
+            loginPage.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        };
+
+        const showAdminPanel = () => {
+            userEmail.textContent = currentUser.email;
+            loginPage.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            loadCalendarEvents();
+            loadDocuments();
+            loadPhotos();
+        };
+
+        // Connexion
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const result = await apiCall('/auth', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', email, password })
+                });
+
+                authToken = result.token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = { email: result.email };
+                showAdminPanel();
+                loginError.classList.add('hidden');
+            } catch (error) {
+                loginError.textContent = 'Erreur de connexion';
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Déconnexion
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            currentUser = null;
+            showLoginPage();
+        });
+
+        // Gestion des onglets
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Mettre à jour les boutons
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'border-gamboge', 'text-gamboge');
+                    b.classList.add('border-transparent', 'text-gray-500');
+                });
+                btn.classList.add('active', 'border-gamboge', 'text-gamboge');
+                btn.classList.remove('border-transparent', 'text-gray-500');
+
+                // Mettre à jour le contenu
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(tabName + 'Tab').classList.remove('hidden');
+                
+                // Charger les données pour l'onglet photos si nécessaire
+                if (tabName === 'photos') {
+                    loadPhotos();
+                }
+            });
+        });
+
+        // Charger les événements du calendrier
+        const loadCalendarEvents = async () => {
+            const calendarList = document.getElementById('calendarList');
+            calendarList.innerHTML = '<div class="text-center">Chargement...</div>';
+
+            try {
+                const events = await apiCall('/calendar');
+                calendarList.innerHTML = '';
+
+                events.forEach(event => {
+                    const eventElement = createEventElement(event);
+                    calendarList.appendChild(eventElement);
+                });
+            } catch (error) {
+                calendarList.innerHTML = '<div class="text-red-600">Erreur de chargement</div>';
+            }
+        };
+
+        // Créer un élément événement
+        const createEventElement = (event) => {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow border flex justify-between items-center';
+            div.innerHTML = `
+                <div>
+                    <div class="font-bold">${event.date}</div>
+                    <div class="text-gray-600">${event.theory}</div>
+                    <div class="text-sm text-gray-500">${event.activities}</div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editEvent(${event.id})" class="text-blue-600 hover:text-blue-800">
+                        Modifier
+                    </button>
+                    <button onclick="deleteEvent(${event.id})" class="text-red-600 hover:text-red-800">
+                        Supprimer
+                    </button>
+                </div>
+            `;
+            return div;
+        };
+
+        // Charger les documents
+        const loadDocuments = async () => {
+            const documentsList = document.getElementById('documentsList');
+            documentsList.innerHTML = '<div class="text-center">Chargement...</div>';
+
+            try {
+                const documents = await apiCall('/documents');
+                documentsList.innerHTML = '';
+
+                documents.forEach(doc => {
+                    const docElement = createDocumentElement(doc);
+                    documentsList.appendChild(docElement);
+                });
+            } catch (error) {
+                documentsList.innerHTML = '<div class="text-red-600">Erreur de chargement</div>';
+            }
+        };
+
+        // Créer un élément document
+        const createDocumentElement = (doc) => {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow border flex justify-between items-center';
+            div.innerHTML = `
+                <div>
+                    <div class="font-bold">${doc.title}</div>
+                    <div class="text-gray-600">${doc.category === 'admin' ? 'Documents administratifs' : 'Fiches Techniques'}</div>
+                    <div class="text-sm text-blue-600">${doc.url}</div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:text-blue-800">
+                        Modifier
+                    </button>
+                    <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:text-red-800">
+                        Supprimer
+                    </button>
+                </div>
+            `;
+            return div;
+        };
+
+        // Charger les photos
+        const loadPhotos = async () => {
+            const photosList = document.getElementById('photosList');
+            photosList.innerHTML = '<div class="text-center">Chargement...</div>';
+
+            try {
+                const photos = await apiCall('/photos');
+                photosList.innerHTML = '';
+
+                photos.forEach(photo => {
+                    const photoElement = createPhotoElement(photo);
+                    photosList.appendChild(photoElement);
+                });
+            } catch (error) {
+                photosList.innerHTML = '<div class="text-red-600">Erreur de chargement</div>';
+            }
+        };
+
+        // Créer un élément photo
+        const createPhotoElement = (photo) => {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow border flex justify-between items-center';
+            const imageUrl = photo.displayUrl || photo.url || '';
+            div.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded">
+                    <div>
+                        <div class="font-bold">${photo.title}</div>
+                        <div class="text-gray-600">${getCategoryLabel(photo.category)}</div>
+                        <div class="text-sm text-gray-500">${photo.description || 'Aucune description'}</div>
+                        ${photo.file_name ? `<div class="text-xs text-blue-600">${photo.file_name}</div>` : ''}
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editPhoto(${photo.id})" class="text-blue-600 hover:text-blue-800">
+                        Modifier
+                    </button>
+                    <button onclick="deletePhoto(${photo.id})" class="text-red-600 hover:text-red-800">
+                        Supprimer
+                    </button>
+                </div>
+            `;
+            return div;
+        };
+
+        // Obtenir le label de la catégorie
+        const getCategoryLabel = (category) => {
+            const labels = {
+                'apiculture': 'Apiculture',
+                'formation': 'Formation',
+                'evenements': 'Événements',
+                'rucher': 'Rucher'
+            };
+            return labels[category] || category;
+        };
+
+        // Gestion des modales
+        const eventModal = document.getElementById('eventModal');
+        const docModal = document.getElementById('docModal');
+        const photoModal = document.getElementById('photoModal');
+
+        document.getElementById('addEventBtn').addEventListener('click', () => {
+            editingEventId = null;
+            document.getElementById('eventForm').reset();
+            eventModal.classList.remove('hidden');
+            eventModal.classList.add('flex');
+        });
+
+        document.getElementById('addDocBtn').addEventListener('click', () => {
+            editingDocId = null;
+            document.getElementById('docForm').reset();
+            docModal.classList.remove('hidden');
+            docModal.classList.add('flex');
+        });
+
+        document.getElementById('addPhotoBtn').addEventListener('click', () => {
+            editingPhotoId = null;
+            document.getElementById('photoForm').reset();
+            
+            // Réinitialiser les sections
+            document.getElementById('fileUploadSection').classList.remove('hidden');
+            document.getElementById('urlSection').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
+            
+            photoModal.classList.remove('hidden');
+            photoModal.classList.add('flex');
+        });
+
+        document.getElementById('cancelEventBtn').addEventListener('click', () => {
+            eventModal.classList.add('hidden');
+            eventModal.classList.remove('flex');
+        });
+
+        document.getElementById('cancelDocBtn').addEventListener('click', () => {
+            docModal.classList.add('hidden');
+            docModal.classList.remove('flex');
+        });
+
+        document.getElementById('cancelPhotoBtn').addEventListener('click', () => {
+            photoModal.classList.add('hidden');
+            photoModal.classList.remove('flex');
+        });
+
+        // Gestion des méthodes d'upload
+        document.querySelectorAll('input[name="uploadMethod"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const method = e.target.value;
+                const fileSection = document.getElementById('fileUploadSection');
+                const urlSection = document.getElementById('urlSection');
+                
+                if (method === 'file') {
+                    fileSection.classList.remove('hidden');
+                    urlSection.classList.add('hidden');
+                    document.getElementById('photoUrl').removeAttribute('required');
+                } else {
+                    fileSection.classList.add('hidden');
+                    urlSection.classList.remove('hidden');
+                    document.getElementById('photoUrl').setAttribute('required', 'required');
+                }
+            });
+        });
+
+        // Gestion de l'aperçu d'image
+        document.getElementById('photoFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            if (file) {
+                // Vérification de la taille (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Le fichier est trop volumineux. Taille maximum: 5MB');
+                    e.target.value = '';
+                    preview.classList.add('hidden');
+                    return;
+                }
+                
+                // Vérification du type
+                if (!file.type.startsWith('image/')) {
+                    alert('Veuillez sélectionner un fichier image valide.');
+                    e.target.value = '';
+                    preview.classList.add('hidden');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewImg.src = event.target.result;
+                    fileInfo.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB, ${file.type})`;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.classList.add('hidden');
+            }
+        });
+
+        // Sauvegarder un événement
+        document.getElementById('eventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const eventData = {
+                date: document.getElementById('eventDate').value,
+                theory: document.getElementById('eventTheory').value,
+                activities: document.getElementById('eventActivities').value
+            };
+
+            try {
+                if (editingEventId) {
+                    await apiCall('/calendar', {
+                        method: 'PUT',
+                        body: JSON.stringify({ ...eventData, id: editingEventId })
+                    });
+                } else {
+                    await apiCall('/calendar', {
+                        method: 'POST',
+                        body: JSON.stringify(eventData)
+                    });
+                }
+                
+                eventModal.classList.add('hidden');
+                eventModal.classList.remove('flex');
+                loadCalendarEvents();
+            } catch (error) {
+                alert('Erreur lors de la sauvegarde: ' + error.message);
+            }
+        });
+
+        // Sauvegarder un document
+        document.getElementById('docForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const docData = {
+                title: document.getElementById('docTitle').value,
+                url: document.getElementById('docUrl').value,
+                category: document.getElementById('docCategory').value
+            };
+
+            try {
+                if (editingDocId) {
+                    await apiCall('/documents', {
+                        method: 'PUT',
+                        body: JSON.stringify({ ...docData, id: editingDocId })
+                    });
+                } else {
+                    await apiCall('/documents', {
+                        method: 'POST',
+                        body: JSON.stringify(docData)
+                    });
+                }
+                
+                docModal.classList.add('hidden');
+                docModal.classList.remove('flex');
+                loadDocuments();
+            } catch (error) {
+                alert('Erreur lors de la sauvegarde: ' + error.message);
+            }
+        });
+
+        // Sauvegarder une photo
+        document.getElementById('photoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const uploadMethod = document.querySelector('input[name="uploadMethod"]:checked').value;
+            const file = document.getElementById('photoFile').files[0];
+            
+            const photoData = {
+                title: document.getElementById('photoTitle').value,
+                description: document.getElementById('photoDescription').value,
+                category: document.getElementById('photoCategory').value
+            };
+
+            try {
+                if (uploadMethod === 'file' && file) {
+                    // Upload de fichier - convertir en Base64
+                    const reader = new FileReader();
+                    
+                    reader.onload = async (event) => {
+                        const dataUrl = event.target.result;
+                        const base64Data = dataUrl.split(',')[1]; // Enlever le préfixe data:mime;base64,
+                        
+                        const fileData = {
+                            ...photoData,
+                            imageData: base64Data,
+                            fileName: file.name,
+                            fileSize: file.size,
+                            mimeType: file.type
+                        };
+
+                        try {
+                            if (editingPhotoId) {
+                                await apiCall('/photos', {
+                                    method: 'PUT',
+                                    body: JSON.stringify({ ...fileData, id: editingPhotoId })
+                                });
+                            } else {
+                                await apiCall('/photos', {
+                                    method: 'POST',
+                                    body: JSON.stringify(fileData)
+                                });
+                            }
+                            
+                            photoModal.classList.add('hidden');
+                            photoModal.classList.remove('flex');
+                            loadPhotos();
+                        } catch (error) {
+                            alert('Erreur lors de la sauvegarde: ' + error.message);
+                        }
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else if (uploadMethod === 'url') {
+                    // Upload par URL
+                    const urlData = {
+                        ...photoData,
+                        url: document.getElementById('photoUrl').value
+                    };
+
+                    if (editingPhotoId) {
+                        await apiCall('/photos', {
+                            method: 'PUT',
+                            body: JSON.stringify({ ...urlData, id: editingPhotoId })
+                        });
+                    } else {
+                        await apiCall('/photos', {
+                            method: 'POST',
+                            body: JSON.stringify(urlData)
+                        });
+                    }
+                    
+                    photoModal.classList.add('hidden');
+                    photoModal.classList.remove('flex');
+                    loadPhotos();
+                } else {
+                    alert('Veuillez sélectionner un fichier ou entrer une URL.');
+                }
+            } catch (error) {
+                alert('Erreur lors de la sauvegarde: ' + error.message);
+            }
+        });
+
+        // Fonctions globales pour les boutons
+        window.editEvent = async (id) => {
+            const events = await apiCall('/calendar');
+            const event = events.find(e => e.id === id);
+            
+            editingEventId = id;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTheory').value = event.theory;
+            document.getElementById('eventActivities').value = event.activities;
+            
+            eventModal.classList.remove('hidden');
+            eventModal.classList.add('flex');
+        };
+
+        window.deleteEvent = async (id) => {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+                await apiCall('/calendar', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id })
+                });
+                loadCalendarEvents();
+            }
+        };
+
+        window.editDocument = async (id) => {
+            const documents = await apiCall('/documents');
+            const doc = documents.find(d => d.id === id);
+            
+            editingDocId = id;
+            document.getElementById('docTitle').value = doc.title;
+            document.getElementById('docUrl').value = doc.url;
+            document.getElementById('docCategory').value = doc.category;
+            
+            docModal.classList.remove('hidden');
+            docModal.classList.add('flex');
+        };
+
+        window.deleteDocument = async (id) => {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+                await apiCall('/documents', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id })
+                });
+                loadDocuments();
+            }
+        };
+
+        window.editPhoto = async (id) => {
+            const photos = await apiCall('/photos');
+            const photo = photos.find(p => p.id === id);
+            
+            editingPhotoId = id;
+            document.getElementById('photoTitle').value = photo.title;
+            document.getElementById('photoDescription').value = photo.description || '';
+            document.getElementById('photoCategory').value = photo.category;
+            
+            // Déterminer si c'est une photo uploadée ou une URL
+            if (photo.image_data) {
+                // Photo uploadée - on ne peut pas la modifier, on affiche juste l'info
+                document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
+                document.getElementById('fileUploadSection').classList.remove('hidden');
+                document.getElementById('urlSection').classList.add('hidden');
+                
+                // Afficher l'aperçu existant
+                const preview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                const fileInfo = document.getElementById('fileInfo');
+                
+                previewImg.src = photo.displayUrl;
+                fileInfo.textContent = `${photo.file_name || 'Image uploadée'} (${photo.mime_type || 'image'})`;
+                preview.classList.remove('hidden');
+                
+                // Désactiver l'input file pour l'édition
+                document.getElementById('photoFile').disabled = true;
+            } else {
+                // Photo par URL
+                document.querySelector('input[name="uploadMethod"][value="url"]').checked = true;
+                document.getElementById('fileUploadSection').classList.add('hidden');
+                document.getElementById('urlSection').classList.remove('hidden');
+                document.getElementById('photoUrl').value = photo.url || '';
+                document.getElementById('imagePreview').classList.add('hidden');
+                
+                // Réactiver l'input file
+                document.getElementById('photoFile').disabled = false;
+            }
+            
+            photoModal.classList.remove('hidden');
+            photoModal.classList.add('flex');
+        };
+
+        window.deletePhoto = async (id) => {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) {
+                await apiCall('/photos', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id })
+                });
+                loadPhotos();
+            }
+        };
+
+        // Initialiser l'app
+        checkAuth();
+    </script>
+</body>
+</html> 

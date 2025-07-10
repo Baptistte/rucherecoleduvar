@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signaler un Essaim | Rucher École</title>
-    <meta name="description" content="Service gratuit de signalement et récupération d'essaims d’abeilles par le Rucher-École du Var, Saint-Raphaël.">
-    <meta name="keywords" content="essaim, abeilles, urgence essaim, récupération, apiculture, Var, Saint-Raphaël">
+    <meta name="description" content="Signalez rapidement un essaim d'abeilles au Rucher-École du Var. Service de récupération d'essaims dans le Var et environs.">
+    <meta name="keywords" content="essaim, abeilles, récupération essaim, urgence, rucher école, Var, Saint-Raphaël">
     <link rel="icon" href="Sans-titrelogo-seul-removebg-preview.png" type="image/png">
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,24 +26,62 @@
                         tigers: '#BA6E1F'
                     },
                     fontFamily: {
-                        titre: ['Montserrat', 'sans-serif'],
-                        corps: ['Lato', 'sans-serif']
+                        gotham: ['Gotham', 'sans-serif'],
+                        titre: ['Gotham', 'sans-serif'],
+                        corps: ['Gotham', 'sans-serif']
                     }
                 }
             }
         }
     </script>
+    <style>
+        @font-face {
+            font-family: 'Gotham';
+            src: url('assets/fonts/Gotham-Medium.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        /* Scrollbar personnalisée jaune miel */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #F6A01F 0%, #BA6E1F 100%);
+            border-radius: 6px;
+            border: 2px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #E6901F 0%, #AA5E1F 100%);
+        }
+
+        /* Pour Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #F6A01F #f1f1f1;
+        }
+    </style>
 </head>
-<body class="font-corps text-white bg-gradient-to-br from-red-700 via-seal to-red-900 min-h-screen flex flex-col">
+<body class="font-gotham text-white bg-gradient-to-br from-red-700 via-seal to-red-900 min-h-screen flex flex-col">
 
     <!-- Navbar réutilisée -->
-    <header class="bg-white/80 backdrop-blur-md shadow-md fixed top-0 inset-x-0 z-50">
+    <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center font-titre text-2xl font-bold"><img src="Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3"><a href="index.html">Rucher-École</a></div>
+            <div class="flex items-center font-titre text-2xl font-bold">
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo Rucher-École" class="h-12 w-auto mr-3">
+                <a href="index.html">Rucher-École du VAR</a>
+            </div>
             <div class="hidden md:flex space-x-8 items-center">
                 <a href="index.html#accueil" class="text-gray-600 hover:text-gamboge transition-colors">Accueil</a>
                 <a href="formulaires.html" class="text-gray-600 hover:text-gamboge transition-colors">Formulaires & Fiches</a>
-                <a href="index.html#galerie" class="text-gray-600 hover:text-gamboge transition-colors">Galerie photo</a>
+                <a href="galerie.html" class="text-gray-600 hover:text-gamboge transition-colors">Galerie photo</a>
                 <a href="planning.html" class="text-gray-600 hover:text-gamboge transition-colors">Planning</a>
                 <a href="index.html#contact" class="text-gray-600 hover:text-gamboge transition-colors">Contact</a>
             </div>
@@ -57,7 +95,7 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white/90">
             <a href="index.html#accueil" class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
             <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires & Fiches</a>
-            <a href="index.html#galerie" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
+            <a href="galerie.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
             <a href="planning.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
             <a href="index.html#contact" class="block py-2 px-4 text-sm hover:bg-fond-clair">Contact</a>
             <a href="index.html#adhesion" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>

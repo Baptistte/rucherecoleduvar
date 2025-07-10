@@ -1,0 +1,22 @@
+# Fichiers système
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Fichiers de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Répertoires de dépendances
+node_modules/
+dist/
+.env
+.netlify/
+
+# Fichiers de configuration IDE
+.idea/
+.vscode/
+*.swp
+*~

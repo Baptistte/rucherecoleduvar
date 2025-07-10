@@ -44,8 +44,36 @@
             }
         }
     </script>
-
+    
     <style>
+        /* Curseur abeille personnalisé */
+
+        /* Scrollbar personnalisée jaune miel */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #F6A01F 0%, #BA6E1F 100%);
+            border-radius: 6px;
+            border: 2px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #E6901F 0%, #AA5E1F 100%);
+        }
+
+        /* Pour Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #F6A01F #f1f1f1;
+        }
+
         /* Vous pouvez ajouter des styles personnalisés ici */
 
         /* Animation douce de zoom pour le background du hero */
@@ -86,19 +114,19 @@
         }
     </style>
 </head>
-<body class="font-corps bg-white text-gray-800">
+<body class="font-gotham bg-fond-clair text-seal">
 
     <!-- 1. Navigation Principale (Header) -->
     <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
             <div class="flex items-center font-titre text-2xl font-bold">
-                <img src="Sans-titrelogo-seul-removebg-preview.png" alt="Logo Rucher-École" loading="lazy" class="h-12 w-auto mr-3">
-                <a href="index.html">Rucher-École</a>
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo Rucher-École" loading="lazy" class="h-12 w-auto mr-3">
+                <a href="index.html">Rucher-École du VAR</a>
             </div>
             <div class="hidden md:flex space-x-8 items-center">
                 <a href="#accueil" class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
                 <a href="formulaires.html" class="text-gray-600 hover:text-miel transition-colors">Formulaires & Fiches</a>
-                <a href="#galerie" class="text-gray-600 hover:text-miel transition-colors">Galerie photo</a>
+                <a href="galerie.html" class="text-gray-600 hover:text-miel transition-colors">Galerie photo</a>
                 <a href="planning.html" class="text-gray-600 hover:text-miel transition-colors">Planning</a>
                 <a href="#contact" class="text-gray-600 hover:text-miel transition-colors">Contact</a>
             </div>
@@ -116,7 +144,7 @@
         <div id="mobile-menu" class="hidden md:hidden">
             <a href="#accueil" class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
             <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires & Fiches</a>
-            <a href="#galerie" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
+            <a href="galerie.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie photo</a>
             <a href="planning.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
             <a href="#contact" class="block py-2 px-4 text-sm hover:bg-fond-clair">Contact</a>
             <a href="#adhesion" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>
@@ -134,7 +162,7 @@
         <!-- 2. Section d'accueil ("Hero Section") -->
         <section id="accueil" class="relative h-screen flex items-start md:items-center pt-24 md:pt-0 justify-center text-center text-white bg-gray-800">
             <!-- Image d'arrière-plan -->
-            <div class="hero-bg absolute inset-0 bg-cover bg-center z-0" style="background-image: url('imagebackground.png');"></div>
+            <div class="hero-bg absolute inset-0 bg-cover bg-center z-0" style="background-image: url('assets/images/imagebackground.png');"></div>
             <!-- Assombrissement de l'image -->
             <div class="absolute inset-0 bg-seal/60 z-10"></div>
             <!-- Contenu -->
@@ -154,23 +182,27 @@
         </section>
 
         <!-- 3. Section "Qui sommes-nous ?" -->
-        <section id="qui-sommes-nous" class="py-20 bg-white relative overflow-hidden">
+        <section id="qui-sommes-nous" class="py-20 relative overflow-hidden">
             <!-- Texture ruche en arrière-plan -->
-            <div class="absolute inset-0 bg-[url('honeycomb.png')] bg-repeat opacity-10 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-[url('assets/images/honeycomb.png')] bg-repeat opacity-5 pointer-events-none"></div>
             <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
                 <div class="reveal">
-                    <h2 class="font-titre text-3xl font-bold mb-4">Qui sommes-nous ?</h2>
-                    <p class="mb-4 text-gray-600">Notre association loi 1901 a pour but de développer la connaissance de l'apiculture et de participer à la protection des abeilles, sentinelles de notre environnement.</p>
-                    <p class="text-gray-600">Le rucher-école du VAR est un lieu d'échange et de formation ouvert à tous, des néophytes curieux aux apiculteurs confirmés souhaitant parfaire leurs techniques.</p>
+                    <h2 class="font-titre text-3xl font-bold mb-4 text-tigers">Qui sommes-nous ?</h2>
+                    <p class="mb-4 text-raw">
+                        Le Rucher-École du Var, basé à Saint-Raphaël, est une association de plus de 150 apiculteurs amateurs. Notre mission est de promouvoir une apiculture respectueuse des abeilles et de l'environnement, à travers la formation et le partage de connaissances.
+                    </p>
+                    <p class="text-raw">
+                        Nous ofrons un lieu d'échange et de pratique pour tous les passionnés, du débutant à l'apiculteur confirmé.
+                    </p>
                 </div>
-                <div class="reveal">
-                    <img src="saintraphresize.jpg" alt="Vue aérienne de Saint-Raphaël et du rucher" loading="lazy" class="rounded-lg shadow-xl w-full h-auto">
+                <div class="reveal" style="transition-delay: 100ms;">
+                    <img src="assets/images/saintraphresize.jpg" alt="Vue aérienne de Saint-Raphaël et du rucher" loading="lazy" class="rounded-lg shadow-xl w-full h-auto">
                 </div>
             </div>
         </section>
         
         <!-- 4. Section "Les Avantages Adhérents" -->
-        <section id="avantages" class="py-20 bg-gradient-to-r from-wheat/40 to-white">
+        <section id="avantages" class="py-20 bg-wheat/20">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="font-titre text-3xl font-bold mb-12 reveal">Pourquoi nous rejoindre ?</h2>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -212,16 +244,16 @@
         </section>
 
         <!-- 5. Section "Adhésion 2025" -->
-        <section id="adhesion" class="py-20 bg-wheat/10">
+        <section id="adhesion" class="py-20">
             <div class="container mx-auto px-6 text-center">
-                <div class="max-w-2xl mx-auto bg-fond-clair p-10 rounded-xl shadow-inner reveal">
+                <div class="max-w-2xl mx-auto bg-white p-10 rounded-xl shadow-lg reveal">
                     <h2 class="font-titre text-3xl font-bold">Adhérez pour la saison 2025</h2>
                     <p class="text-2xl font-bold text-miel my-4">Cotisation : 25 €</p>
                     <p class="text-gray-600 mb-6">Tarif réduit à <span class="font-bold">15 €</span> pour toute adhésion avant le 15 mars !</p>
                     <a href="https://v-assets.cdnsw.com/dl/Root/gb2ho-COTISATION-mars-2025-RE.pdf" class="inline-block bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition-colors text-lg" target="_blank" download>
                         📥 Télécharger le bulletin d'adhésion
                     </a>
-                    <p class="mt-6 text-sm text-gray-500">
+                    <p class="mt-6 text-sm">
                         Curieux ? <a href="#" class="text-miel underline hover:text-yellow-600 font-bold">QUIZZ ABEILLES</a>
                     </p>
                 </div>
@@ -229,50 +261,48 @@
         </section>
 
         <!-- 6. Section "Urgence Essaim" -->
-        <section id="urgence-essaim" class="bg-red-50 py-10">
+        <section id="urgence-essaim" class="bg-red-100 py-10">
             <div class="container mx-auto px-6 text-center reveal">
                 <h3 class="font-titre text-2xl font-bold text-red-800">SIGNALER UN ESSAIM</h3>
                 <p class="text-red-700 mt-2">N'intervenez pas vous-même. Contactez notre service de récupération gratuit.</p>
-                <a href="urgence.html" class="mt-4 inline-block text-2xl font-bold text-red-800 border-2 border-red-700 rounded-full px-6 py-3 hover:bg-red-100 transition-colors">
+                <a href="urgence.html" class="mt-4 inline-block text-2xl font-bold text-white border-2 border-white rounded-full px-6 py-3 hover:bg-red-700 transition-colors">
                     📞 06 64 92 52 21
                 </a>
             </div>
         </section>
 
         <!-- 7. Aperçu de la Galerie -->
-        <section id="galerie" class="py-20 bg-white">
+        <section id="galerie" class="py-20">
             <div class="container mx-auto px-6">
                 <h2 class="font-titre text-3xl font-bold text-center mb-12 reveal">La vie du rucher en images</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="group relative overflow-hidden rounded-lg reveal">
-                        <img src="https://picsum.photos/400/500?image=106" alt="Apiculteur au travail" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                    <a href="galerie.html" class="group relative overflow-hidden rounded-lg reveal">
+                        <img src="assets/images/atelierpedago.jpg" alt="Apiculteur au travail" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                             <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Atelier Pédagogique</h4>
                         </div>
-                    </div>
-                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 100ms;">
-                        <img src="https://picsum.photos/400/500?image=211" alt="Récolte du miel" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                    </a>
+                     <a href="galerie.html" class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 100ms;">
+                        <img src="assets/images/recoltemiel.jpg" alt="Récolte du miel" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                             <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Récolte du Miel</h4>
                         </div>
-                    </div>
-                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 200ms;">
-                        <img src="https://picsum.photos/400/500?image=239" alt="Une ruche" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                    </a>
+                     <a href="galerie.html" class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 200ms;">
+                        <img src="assets/images/viedurucher.jpg" alt="Une ruche" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                             <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Vie du Rucher</h4>
                         </div>
-                    </div>
-                     <div class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 300ms;">
-                        <img src="https://picsum.photos/400/500?image=244" alt="Fleur et abeille" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+                    </a>
+                     <a href="galerie.html" class="group relative overflow-hidden rounded-lg reveal" style="transition-delay: 300ms;">
+                        <img src="assets/images/environnement.jpg" alt="Fleur et abeille" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                             <h4 class="text-white font-titre text-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">Notre Environnement</h4>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="text-center mt-12">
-                     <a href="#" class="inline-block bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition-colors text-lg">
-                        Voir toute la galerie
-                    </a>
+                    <a href="galerie.html" class="bg-gamboge hover:bg-yellow-500 text-white font-bold py-3 px-8 rounded-full transition-transform transform hover:scale-105 inline-block">Voir toute la galerie</a>
                 </div>
             </div>
         </section>
@@ -290,8 +320,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Colonne 1: Logo et Association -->
                 <div>
-                    <h3 class="font-titre text-xl font-bold mb-2">Rucher-École du VAR</h3>
-                    <p class="text-gray-400">RUCHER ECOLE DU VAR<br/>Association loi 1901</p>
+                    <h3 class="font-titre text-xl font-bold mb-2">Rucher-École du VAR de l'EST VAR</h3>
+                    <p class="text-gray-400">RUCHER ECOLE DU VAR section de l'EST VAR<br/>Association loi 1901</p>
                     <p class="text-gray-400 mt-2">2500 Boulevard Jacques Baudino<br/>83700 Saint-Raphaël</p>
                 </div>
 
