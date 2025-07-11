@@ -7,4 +7,4 @@ Disallow: /gestion-ne6rshum9w-9t1fhqm3x7.html
 Disallow: /netlify/
 
 # Chemin vers le sitemap
-Sitemap: https://www.rucher-ecole-var.fr/sitemap.xml 
+Sitemap: https://rucherecoleduvar.com/sitemap.xml 
