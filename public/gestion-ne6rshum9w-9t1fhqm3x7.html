@@ -26,13 +26,12 @@
                     fontFamily: {
                         gotham: ['Gotham', 'sans-serif'],
                         titre: ['Gotham', 'sans-serif'],
-                        corps: ['Gotham', 'sans-serif']
+                        corps: ['Gotham', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-
     <style>
         @font-face {
             font-family: 'Gotham';
@@ -68,6 +67,7 @@
         }
     </style>
 </head>
+
 <body class="font-gotham bg-fond-clair min-h-screen">
 
     <!-- Navigation -->
@@ -89,12 +89,15 @@
     <!-- Page de connexion -->
     <div id="loginPage" class="flex items-center justify-center min-h-screen px-4">
         <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+            <div class="flex items-center justify-center mb-6">
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-16 w-auto">
+            </div>
             <h1 class="font-titre text-2xl font-bold mb-6 text-center">Connexion Admin</h1>
             <form id="loginForm">
-                <div class="mb-4">
+                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" id="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-gamboge">
-                </div>
+                    <input type="email" id="email" required autocomplete="username" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-gamboge">
+                 </div>
                 <div class="mb-6">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
                     <input type="password" id="password" required autocomplete="current-password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-gamboge">
@@ -142,24 +145,24 @@
 
             <!-- Section Documents -->
             <div id="documentsTab" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
+             <div class="flex justify-between items-center mb-6">
                     <h2 class="font-titre text-2xl font-bold">Gestion des Documents</h2>
-                    <button id="addDocBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
-                        Ajouter un document
-                    </button>
-                </div>
-                <div id="documentsList" class="space-y-4"></div>
+                 <button id="addDocBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                     Ajouter un document
+                 </button>
+             </div>
+             <div id="documentsList" class="space-y-4"></div>
             </div>
 
             <!-- Section Photos -->
             <div id="photosTab" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-6">
+             <div class="flex justify-between items-center mb-6">
                     <h2 class="font-titre text-2xl font-bold">Gestion de la Galerie Photo</h2>
-                    <button id="addPhotoBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
-                        Ajouter une photo
-                    </button>
-                </div>
-                <div id="photosList" class="space-y-4"></div>
+                 <button id="addPhotoBtn" class="bg-gamboge text-black px-4 py-2 rounded-lg hover:bg-yellow-500">
+                     Ajouter une photo
+                 </button>
+             </div>
+             <div id="photosList" class="space-y-4"></div>
             </div>
         </div>
     </div>
@@ -170,16 +173,20 @@
             <h3 class="font-titre text-xl font-bold mb-4">Événement</h3>
             <form id="eventForm">
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Date & Horaires</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Date & Horaires (Texte affiché)</label>
                     <input type="text" id="eventDate" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Théorie</label>
                     <input type="text" id="eventTheory" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
-                <div class="mb-6">
+                <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Activités prévues</label>
                     <input type="text" id="eventActivities" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                 <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Date pour le tri (YYYY-MM-DD)</label>
+                    <input type="date" id="eventSortDate" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="button" id="cancelEventBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
@@ -434,6 +441,10 @@
             });
         });
 
+        // ===================================
+        // GESTION DU CALENDRIER (NOUVELLE LOGIQUE)
+        // ===================================
+
         // Charger les événements du calendrier
         const loadCalendarEvents = async () => {
             const calendarList = document.getElementById('calendarList');
@@ -463,7 +474,7 @@
                     <div class="text-sm text-gray-500">${event.activities}</div>
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editEvent(${event.id})" class="text-blue-600 hover:text-blue-800">
+                    <button onclick="editEvent(${event.id}, '${event.date}', '${event.theory}', '${event.activities}', '${event.date_sort}')" class="text-blue-600 hover:text-blue-800">
                         Modifier
                     </button>
                     <button onclick="deleteEvent(${event.id})" class="text-red-600 hover:text-red-800">
@@ -499,11 +510,11 @@
             div.innerHTML = `
                 <div>
                     <div class="font-bold">${doc.title}</div>
-                    <div class="text-gray-600">${doc.category === 'admin' ? 'Documents administratifs' : 'Fiches Techniques'}</div>
-                    <div class="text-sm text-blue-600">${doc.url}</div>
+                    <div class="text-gray-600">${doc.url}</div>
+                    <div class="text-sm text-gray-500">Catégorie: ${doc.category}</div>
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editDocument(${doc.id})" class="text-blue-600 hover:text-blue-800">
+                    <button onclick="editDocument(${doc.id}, '${doc.title}', '${doc.url}', '${doc.category}')" class="text-blue-600 hover:text-blue-800">
                         Modifier
                     </button>
                     <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:text-red-800">
@@ -535,23 +546,33 @@
         // Créer un élément photo
         const createPhotoElement = (photo) => {
             const div = document.createElement('div');
-            div.className = 'bg-white p-4 rounded-lg shadow border flex justify-between items-center';
-            const imageUrl = photo.displayUrl || photo.url || '';
+            div.className = 'bg-white p-4 rounded-lg shadow border flex items-center space-x-4';
+            
+            // Créer l'URL d'affichage de l'image
+            let imageUrl = '';
+            if (photo.displayUrl) {
+                imageUrl = photo.displayUrl;
+            } else if (photo.url) {
+                imageUrl = photo.url;
+            } else if (photo.image_data && photo.mime_type) {
+                imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+            }
+            
             div.innerHTML = `
-                <div class="flex items-center space-x-4">
-                    <img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded">
-                    <div>
-                        <div class="font-bold">${photo.title}</div>
-                        <div class="text-gray-600">${getCategoryLabel(photo.category)}</div>
-                        <div class="text-sm text-gray-500">${photo.description || 'Aucune description'}</div>
-                        ${photo.file_name ? `<div class="text-xs text-blue-600">${photo.file_name}</div>` : ''}
-                    </div>
+                <div class="flex-shrink-0">
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded border" onerror="this.style.display='none'">` : '<div class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center text-gray-500 text-xs">Pas d\'image</div>'}
+                </div>
+                <div class="flex-grow">
+                    <div class="font-bold">${photo.title}</div>
+                    <div class="text-gray-600 text-sm">${photo.description || 'Aucune description'}</div>
+                    <div class="text-xs text-gray-500">Catégorie: ${photo.category}</div>
+                    ${photo.file_name ? `<div class="text-xs text-gray-400">Fichier: ${photo.file_name}</div>` : ''}
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editPhoto(${photo.id})" class="text-blue-600 hover:text-blue-800">
+                    <button onclick="editPhoto(${photo.id})" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border rounded hover:bg-blue-50">
                         Modifier
                     </button>
-                    <button onclick="deletePhoto(${photo.id})" class="text-red-600 hover:text-red-800">
+                    <button onclick="deletePhoto(${photo.id})" class="text-red-600 hover:text-red-800 text-sm px-2 py-1 border rounded hover:bg-red-50">
                         Supprimer
                     </button>
                 </div>
@@ -559,17 +580,10 @@
             return div;
         };
 
-        // Obtenir le label de la catégorie
-        const getCategoryLabel = (category) => {
-            const labels = {
-                'apiculture': 'Apiculture',
-                'formation': 'Formation',
-                'evenements': 'Événements',
-                'rucher': 'Rucher'
-            };
-            return labels[category] || category;
-        };
-
+        // ===================================
+        // INITIALISATION & GESTION DES MODALES
+        // ===================================
+        
         // Gestion des modales
         const eventModal = document.getElementById('eventModal');
         const docModal = document.getElementById('docModal');
@@ -588,17 +602,11 @@
             docModal.classList.remove('hidden');
             docModal.classList.add('flex');
         });
-
+        
         document.getElementById('addPhotoBtn').addEventListener('click', () => {
             editingPhotoId = null;
             document.getElementById('photoForm').reset();
-            
-            // Réinitialiser les sections
-            document.getElementById('fileUploadSection').classList.remove('hidden');
-            document.getElementById('urlSection').classList.add('hidden');
-            document.getElementById('imagePreview').classList.add('hidden');
-            document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
-            
+            resetPhotoPreview();
             photoModal.classList.remove('hidden');
             photoModal.classList.add('flex');
         });
@@ -612,65 +620,10 @@
             docModal.classList.add('hidden');
             docModal.classList.remove('flex');
         });
-
+        
         document.getElementById('cancelPhotoBtn').addEventListener('click', () => {
             photoModal.classList.add('hidden');
             photoModal.classList.remove('flex');
-        });
-
-        // Gestion des méthodes d'upload
-        document.querySelectorAll('input[name="uploadMethod"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const method = e.target.value;
-                const fileSection = document.getElementById('fileUploadSection');
-                const urlSection = document.getElementById('urlSection');
-                
-                if (method === 'file') {
-                    fileSection.classList.remove('hidden');
-                    urlSection.classList.add('hidden');
-                    document.getElementById('photoUrl').removeAttribute('required');
-                } else {
-                    fileSection.classList.add('hidden');
-                    urlSection.classList.remove('hidden');
-                    document.getElementById('photoUrl').setAttribute('required', 'required');
-                }
-            });
-        });
-
-        // Gestion de l'aperçu d'image
-        document.getElementById('photoFile').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            const preview = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('previewImg');
-            const fileInfo = document.getElementById('fileInfo');
-            
-            if (file) {
-                // Vérification de la taille (5MB max)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Le fichier est trop volumineux. Taille maximum: 5MB');
-                    e.target.value = '';
-                    preview.classList.add('hidden');
-                    return;
-                }
-                
-                // Vérification du type
-                if (!file.type.startsWith('image/')) {
-                    alert('Veuillez sélectionner un fichier image valide.');
-                    e.target.value = '';
-                    preview.classList.add('hidden');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    previewImg.src = event.target.result;
-                    fileInfo.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB, ${file.type})`;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.classList.add('hidden');
-            }
         });
 
         // Sauvegarder un événement
@@ -680,7 +633,8 @@
             const eventData = {
                 date: document.getElementById('eventDate').value,
                 theory: document.getElementById('eventTheory').value,
-                activities: document.getElementById('eventActivities').value
+                activities: document.getElementById('eventActivities').value,
+                date_sort: document.getElementById('eventSortDate').value
             };
 
             try {
@@ -745,76 +699,189 @@
             const photoData = {
                 title: document.getElementById('photoTitle').value,
                 description: document.getElementById('photoDescription').value,
-                category: document.getElementById('photoCategory').value
+                category: document.getElementById('photoCategory').value,
+                url: uploadMethod === 'url' ? document.getElementById('photoUrl').value : null
             };
 
-            try {
-                if (uploadMethod === 'file' && file) {
-                    // Upload de fichier - convertir en Base64
-                    const reader = new FileReader();
+            if (uploadMethod === 'file' && file) {
+                // Upload de fichier - convertir en Base64
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    const dataUrl = event.target.result;
+                    const base64Data = dataUrl.split(',')[1]; // Enlever le préfixe data:mime;base64,
                     
-                    reader.onload = async (event) => {
-                        const dataUrl = event.target.result;
-                        const base64Data = dataUrl.split(',')[1]; // Enlever le préfixe data:mime;base64,
-                        
-                        const fileData = {
-                            ...photoData,
-                            imageData: base64Data,
-                            fileName: file.name,
-                            fileSize: file.size,
-                            mimeType: file.type
-                        };
-
-                        try {
-                            if (editingPhotoId) {
-                                await apiCall('/photos', {
-                                    method: 'PUT',
-                                    body: JSON.stringify({ ...fileData, id: editingPhotoId })
-                                });
-                            } else {
-                                await apiCall('/photos', {
-                                    method: 'POST',
-                                    body: JSON.stringify(fileData)
-                                });
-                            }
-                            
-                            photoModal.classList.add('hidden');
-                            photoModal.classList.remove('flex');
-                            loadPhotos();
-                        } catch (error) {
-                            alert('Erreur lors de la sauvegarde: ' + error.message);
-                        }
-                    };
-                    
-                    reader.readAsDataURL(file);
-                } else if (uploadMethod === 'url') {
-                    // Upload par URL
-                    const urlData = {
+                    const fileData = {
                         ...photoData,
-                        url: document.getElementById('photoUrl').value
+                        imageData: base64Data,
+                        fileName: file.name,
+                        fileSize: file.size,
+                        mimeType: file.type
                     };
 
-                    if (editingPhotoId) {
-                        await apiCall('/photos', {
-                            method: 'PUT',
-                            body: JSON.stringify({ ...urlData, id: editingPhotoId })
-                        });
-                    } else {
-                        await apiCall('/photos', {
-                            method: 'POST',
-                            body: JSON.stringify(urlData)
-                        });
+                    try {
+                        if (editingPhotoId) {
+                            await apiCall('/photos', {
+                                method: 'PUT',
+                                body: JSON.stringify({ ...fileData, id: editingPhotoId })
+                            });
+                        } else {
+                            await apiCall('/photos', {
+                                method: 'POST',
+                                body: JSON.stringify(fileData)
+                            });
+                        }
+                        
+                        photoModal.classList.add('hidden');
+                        photoModal.classList.remove('flex');
+                        loadPhotos();
+                    } catch (error) {
+                        alert('Erreur lors de la sauvegarde: ' + error.message);
                     }
-                    
-                    photoModal.classList.add('hidden');
-                    photoModal.classList.remove('flex');
-                    loadPhotos();
+                };
+                
+                reader.readAsDataURL(file);
+            } else if (uploadMethod === 'url') {
+                // Upload par URL
+                const urlData = {
+                    ...photoData,
+                    url: document.getElementById('photoUrl').value
+                };
+
+                if (editingPhotoId) {
+                    await apiCall('/photos', {
+                        method: 'PUT',
+                        body: JSON.stringify({ ...urlData, id: editingPhotoId })
+                    });
                 } else {
-                    alert('Veuillez sélectionner un fichier ou entrer une URL.');
+                    await apiCall('/photos', {
+                        method: 'POST',
+                        body: JSON.stringify(urlData)
+                    });
                 }
-            } catch (error) {
-                alert('Erreur lors de la sauvegarde: ' + error.message);
+                
+                photoModal.classList.add('hidden');
+                photoModal.classList.remove('flex');
+                loadPhotos();
+            } else {
+                alert('Veuillez sélectionner un fichier ou entrer une URL.');
             }
+        });
+
+        // ===================================
+        // GESTION DE LA PRÉVISUALISATION D'IMAGES
+        // ===================================
+        
+        // Réinitialiser la prévisualisation
+        const resetPhotoPreview = () => {
+            const preview = document.getElementById('imagePreview');
+            const fileInput = document.getElementById('photoFile');
+            const urlInput = document.getElementById('photoUrl');
+            
+            preview.classList.add('hidden');
+            fileInput.disabled = false;
+            
+            // Réinitialiser les sections upload
+            document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
+            document.getElementById('fileUploadSection').classList.remove('hidden');
+            document.getElementById('urlSection').classList.add('hidden');
+        };
+
+        // Prévisualisation d'image à partir d'un fichier
+        const previewImageFromFile = (file) => {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    fileInfo.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Prévisualisation d'image à partir d'une URL
+        const previewImageFromUrl = (url) => {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            if (url) {
+                previewImg.src = url;
+                fileInfo.textContent = 'Image depuis URL';
+                preview.classList.remove('hidden');
+                
+                // Gérer les erreurs de chargement
+                previewImg.onerror = () => {
+                    fileInfo.textContent = 'Erreur de chargement de l\'image';
+                    previewImg.src = '';
+                };
+            } else {
+                preview.classList.add('hidden');
+            }
+        };
+
+        // Gestionnaires d'événements pour la prévisualisation
+        document.getElementById('photoFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                previewImageFromFile(file);
+            } else {
+                document.getElementById('imagePreview').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('photoUrl').addEventListener('input', (e) => {
+            const url = e.target.value.trim();
+            if (url) {
+                // Débounce pour éviter trop d'appels
+                clearTimeout(window.urlPreviewTimeout);
+                window.urlPreviewTimeout = setTimeout(() => {
+                    previewImageFromUrl(url);
+                }, 500);
+            } else {
+                document.getElementById('imagePreview').classList.add('hidden');
+            }
+        });
+
+        // Gestion du changement de méthode d'upload
+        document.querySelectorAll('input[name="uploadMethod"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const method = e.target.value;
+                const fileSection = document.getElementById('fileUploadSection');
+                const urlSection = document.getElementById('urlSection');
+                const preview = document.getElementById('imagePreview');
+                
+                if (method === 'file') {
+                    fileSection.classList.remove('hidden');
+                    urlSection.classList.add('hidden');
+                    document.getElementById('photoUrl').value = '';
+                    
+                    // Vérifier s'il y a déjà un fichier sélectionné
+                    const file = document.getElementById('photoFile').files[0];
+                    if (file) {
+                        previewImageFromFile(file);
+                    } else {
+                        preview.classList.add('hidden');
+                    }
+                } else {
+                    fileSection.classList.add('hidden');
+                    urlSection.classList.remove('hidden');
+                    document.getElementById('photoFile').value = '';
+                    
+                    // Vérifier s'il y a déjà une URL
+                    const url = document.getElementById('photoUrl').value.trim();
+                    if (url) {
+                        previewImageFromUrl(url);
+                    } else {
+                        preview.classList.add('hidden');
+                    }
+                }
+            });
         });
 
         // Fonctions globales pour les boutons
@@ -921,4 +988,4 @@
         checkAuth();
     </script>
 </body>
-</html> 
+</html>

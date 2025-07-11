@@ -56,7 +56,7 @@ const validatePhotoData = (data) => {
   }
   
   // Validation de la catégorie
-  const validCategories = ['formation', 'environnement', 'evenement', 'materiel', 'autre'];
+  const validCategories = ['apiculture', 'formation', 'evenements', 'rucher'];
   if (!category || !validCategories.includes(category)) {
     return { valid: false, error: 'Invalid category' };
   }
@@ -104,7 +104,16 @@ const isValidBase64 = (str) => {
     if (str.length > MAX_FILE_SIZE * 1.4) { // Base64 ajoute ~33% de taille
       return false;
     }
-    return btoa(atob(str)) === str;
+    
+    // Validation basique du format Base64
+    const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+    if (!base64Regex.test(str)) {
+      return false;
+    }
+    
+    // Utiliser Buffer pour valider le Base64 dans Node.js
+    const buffer = Buffer.from(str, 'base64');
+    return buffer.length > 0;
   } catch (err) {
     return false;
   }
