@@ -474,14 +474,33 @@
                     <div class="text-sm text-gray-500">${event.activities}</div>
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editEvent(${event.id}, '${event.date}', '${event.theory}', '${event.activities}', '${event.date_sort}')" class="text-blue-600 hover:text-blue-800">
+                    <button class="edit-event-btn text-blue-600 hover:text-blue-800" 
+                            data-id="${event.id}" 
+                            data-date="${event.date}" 
+                            data-theory="${event.theory}" 
+                            data-activities="${event.activities}" 
+                            data-sort-date="${event.date_sort}">
                         Modifier
                     </button>
-                    <button onclick="deleteEvent(${event.id})" class="text-red-600 hover:text-red-800">
+                    <button class="delete-event-btn text-red-600 hover:text-red-800" 
+                            data-id="${event.id}">
                         Supprimer
                     </button>
                 </div>
             `;
+            
+            // Ajouter les gestionnaires d'événements
+            const editBtn = div.querySelector('.edit-event-btn');
+            const deleteBtn = div.querySelector('.delete-event-btn');
+            
+            editBtn.addEventListener('click', () => {
+                window.editEvent(event.id, event.date, event.theory, event.activities, event.date_sort);
+            });
+            
+            deleteBtn.addEventListener('click', () => {
+                window.deleteEvent(event.id);
+            });
+            
             return div;
         };
 
@@ -514,14 +533,32 @@
                     <div class="text-sm text-gray-500">Catégorie: ${doc.category}</div>
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editDocument(${doc.id}, '${doc.title}', '${doc.url}', '${doc.category}')" class="text-blue-600 hover:text-blue-800">
+                    <button class="edit-doc-btn text-blue-600 hover:text-blue-800" 
+                            data-id="${doc.id}" 
+                            data-title="${doc.title}" 
+                            data-url="${doc.url}" 
+                            data-category="${doc.category}">
                         Modifier
                     </button>
-                    <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:text-red-800">
+                    <button class="delete-doc-btn text-red-600 hover:text-red-800" 
+                            data-id="${doc.id}">
                         Supprimer
                     </button>
                 </div>
             `;
+            
+            // Ajouter les gestionnaires d'événements
+            const editBtn = div.querySelector('.edit-doc-btn');
+            const deleteBtn = div.querySelector('.delete-doc-btn');
+            
+            editBtn.addEventListener('click', () => {
+                window.editDocument(doc.id, doc.title, doc.url, doc.category);
+            });
+            
+            deleteBtn.addEventListener('click', () => {
+                window.deleteDocument(doc.id);
+            });
+            
             return div;
         };
 
@@ -569,14 +606,29 @@
                     ${photo.file_name ? `<div class="text-xs text-gray-400">Fichier: ${photo.file_name}</div>` : ''}
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="editPhoto(${photo.id})" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border rounded hover:bg-blue-50">
+                    <button class="edit-photo-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border rounded hover:bg-blue-50" 
+                            data-id="${photo.id}">
                         Modifier
                     </button>
-                    <button onclick="deletePhoto(${photo.id})" class="text-red-600 hover:text-red-800 text-sm px-2 py-1 border rounded hover:bg-red-50">
+                    <button class="delete-photo-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 border rounded hover:bg-red-50" 
+                            data-id="${photo.id}">
                         Supprimer
                     </button>
                 </div>
             `;
+            
+            // Ajouter les gestionnaires d'événements
+            const editBtn = div.querySelector('.edit-photo-btn');
+            const deleteBtn = div.querySelector('.delete-photo-btn');
+            
+            editBtn.addEventListener('click', () => {
+                window.editPhoto(photo.id);
+            });
+            
+            deleteBtn.addEventListener('click', () => {
+                window.deletePhoto(photo.id);
+            });
+            
             return div;
         };
 
