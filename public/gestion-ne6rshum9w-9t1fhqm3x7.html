@@ -657,6 +657,7 @@
         
         document.getElementById('addPhotoBtn').addEventListener('click', () => {
             editingPhotoId = null;
+            window.currentPhotoData = null;
             document.getElementById('photoForm').reset();
             resetPhotoPreview();
             photoModal.classList.remove('hidden');
@@ -674,6 +675,8 @@
         });
         
         document.getElementById('cancelPhotoBtn').addEventListener('click', () => {
+            editingPhotoId = null;
+            window.currentPhotoData = null;
             photoModal.classList.add('hidden');
             photoModal.classList.remove('flex');
         });
@@ -751,14 +754,27 @@
                 category: document.getElementById('photoCategory').value
             };
 
-            // En mode édition, on ne modifie que les métadonnées
+            // En mode édition, on ne modifie que les métadonnées mais on inclut les données d'image existantes
             if (editingPhotoId) {
                 try {
+                    const updateData = {
+                        ...photoData,
+                        id: editingPhotoId,
+                        // Inclure les données d'image existantes
+                        url: window.currentPhotoData.url,
+                        imageData: window.currentPhotoData.imageData,
+                        fileName: window.currentPhotoData.fileName,
+                        fileSize: window.currentPhotoData.fileSize,
+                        mimeType: window.currentPhotoData.mimeType
+                    };
+                    
                     await apiCall('/photos', {
                         method: 'PUT',
-                        body: JSON.stringify({ ...photoData, id: editingPhotoId })
+                        body: JSON.stringify(updateData)
                     });
                     
+                    editingPhotoId = null;
+                    window.currentPhotoData = null;
                     photoModal.classList.add('hidden');
                     photoModal.classList.remove('flex');
                     loadPhotos();
@@ -796,6 +812,8 @@
                             body: JSON.stringify(fileData)
                         });
                         
+                        editingPhotoId = null;
+                        window.currentPhotoData = null;
                         photoModal.classList.add('hidden');
                         photoModal.classList.remove('flex');
                         loadPhotos();
@@ -818,6 +836,8 @@
                         body: JSON.stringify(urlData)
                     });
                     
+                    editingPhotoId = null;
+                    window.currentPhotoData = null;
                     photoModal.classList.add('hidden');
                     photoModal.classList.remove('flex');
                     loadPhotos();
@@ -1001,6 +1021,16 @@
             const photo = photos.find(p => p.id === id);
             
             editingPhotoId = id;
+            
+            // Stocker les données de la photo existante pour les inclure dans la modification
+            window.currentPhotoData = {
+                url: photo.url,
+                imageData: photo.image_data,
+                fileName: photo.file_name,
+                fileSize: photo.file_size,
+                mimeType: photo.mime_type
+            };
+            
             document.getElementById('photoTitle').value = photo.title;
             document.getElementById('photoDescription').value = photo.description || '';
             document.getElementById('photoCategory').value = photo.category;
