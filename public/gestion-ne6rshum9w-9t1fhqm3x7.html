@@ -745,15 +745,34 @@
         document.getElementById('photoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const uploadMethod = document.querySelector('input[name="uploadMethod"]:checked').value;
-            const file = document.getElementById('photoFile').files[0];
-            
             const photoData = {
                 title: document.getElementById('photoTitle').value,
                 description: document.getElementById('photoDescription').value,
-                category: document.getElementById('photoCategory').value,
-                url: uploadMethod === 'url' ? document.getElementById('photoUrl').value : null
+                category: document.getElementById('photoCategory').value
             };
+
+            // En mode édition, on ne modifie que les métadonnées
+            if (editingPhotoId) {
+                try {
+                    await apiCall('/photos', {
+                        method: 'PUT',
+                        body: JSON.stringify({ ...photoData, id: editingPhotoId })
+                    });
+                    
+                    photoModal.classList.add('hidden');
+                    photoModal.classList.remove('flex');
+                    loadPhotos();
+                } catch (error) {
+                    alert('Erreur lors de la sauvegarde: ' + error.message);
+                }
+                return;
+            }
+
+            // Mode création - gérer l'upload d'image
+            const uploadMethod = document.querySelector('input[name="uploadMethod"]:checked').value;
+            const file = document.getElementById('photoFile').files[0];
+            
+            photoData.url = uploadMethod === 'url' ? document.getElementById('photoUrl').value : null;
 
             if (uploadMethod === 'file' && file) {
                 // Upload de fichier - convertir en Base64
@@ -772,17 +791,10 @@
                     };
 
                     try {
-                        if (editingPhotoId) {
-                            await apiCall('/photos', {
-                                method: 'PUT',
-                                body: JSON.stringify({ ...fileData, id: editingPhotoId })
-                            });
-                        } else {
-                            await apiCall('/photos', {
-                                method: 'POST',
-                                body: JSON.stringify(fileData)
-                            });
-                        }
+                        await apiCall('/photos', {
+                            method: 'POST',
+                            body: JSON.stringify(fileData)
+                        });
                         
                         photoModal.classList.add('hidden');
                         photoModal.classList.remove('flex');
@@ -793,28 +805,25 @@
                 };
                 
                 reader.readAsDataURL(file);
-            } else if (uploadMethod === 'url') {
+            } else if (uploadMethod === 'url' && document.getElementById('photoUrl').value) {
                 // Upload par URL
                 const urlData = {
                     ...photoData,
                     url: document.getElementById('photoUrl').value
                 };
 
-                if (editingPhotoId) {
-                    await apiCall('/photos', {
-                        method: 'PUT',
-                        body: JSON.stringify({ ...urlData, id: editingPhotoId })
-                    });
-                } else {
+                try {
                     await apiCall('/photos', {
                         method: 'POST',
                         body: JSON.stringify(urlData)
                     });
+                    
+                    photoModal.classList.add('hidden');
+                    photoModal.classList.remove('flex');
+                    loadPhotos();
+                } catch (error) {
+                    alert('Erreur lors de la sauvegarde: ' + error.message);
                 }
-                
-                photoModal.classList.add('hidden');
-                photoModal.classList.remove('flex');
-                loadPhotos();
             } else {
                 alert('Veuillez sélectionner un fichier ou entrer une URL.');
             }
@@ -837,6 +846,10 @@
             document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
             document.getElementById('fileUploadSection').classList.remove('hidden');
             document.getElementById('urlSection').classList.add('hidden');
+            
+            // Réafficher la section "Méthode d'ajout" en cas d'édition précédente
+            const uploadMethodSection = document.querySelector('input[name="uploadMethod"]').closest('.mb-4');
+            uploadMethodSection.style.display = 'block';
         };
 
         // Prévisualisation d'image à partir d'un fichier
@@ -992,34 +1005,35 @@
             document.getElementById('photoDescription').value = photo.description || '';
             document.getElementById('photoCategory').value = photo.category;
             
-            // Déterminer si c'est une photo uploadée ou une URL
-            if (photo.image_data) {
-                // Photo uploadée - on ne peut pas la modifier, on affiche juste l'info
-                document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
-                document.getElementById('fileUploadSection').classList.remove('hidden');
-                document.getElementById('urlSection').classList.add('hidden');
-                
-                // Afficher l'aperçu existant
-                const preview = document.getElementById('imagePreview');
-                const previewImg = document.getElementById('previewImg');
-                const fileInfo = document.getElementById('fileInfo');
-                
-                previewImg.src = photo.displayUrl;
-                fileInfo.textContent = `${photo.file_name || 'Image uploadée'} (${photo.mime_type || 'image'})`;
+            // En mode édition, on cache toutes les sections d'upload/URL
+            // L'utilisateur ne peut modifier que les métadonnées (titre, description, catégorie)
+            document.getElementById('fileUploadSection').classList.add('hidden');
+            document.getElementById('urlSection').classList.add('hidden');
+            
+            // Cacher la section "Méthode d'ajout"
+            const uploadMethodSection = document.querySelector('input[name="uploadMethod"]').closest('.mb-4');
+            uploadMethodSection.style.display = 'none';
+            
+            // Afficher un aperçu de l'image existante si disponible
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            let imageUrl = '';
+            if (photo.displayUrl) {
+                imageUrl = photo.displayUrl;
+            } else if (photo.url) {
+                imageUrl = photo.url;
+            } else if (photo.image_data && photo.mime_type) {
+                imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+            }
+            
+            if (imageUrl) {
+                previewImg.src = imageUrl;
+                fileInfo.textContent = `Image actuelle: ${photo.file_name || 'Photo existante'}`;
                 preview.classList.remove('hidden');
-                
-                // Désactiver l'input file pour l'édition
-                document.getElementById('photoFile').disabled = true;
             } else {
-                // Photo par URL
-                document.querySelector('input[name="uploadMethod"][value="url"]').checked = true;
-                document.getElementById('fileUploadSection').classList.add('hidden');
-                document.getElementById('urlSection').classList.remove('hidden');
-                document.getElementById('photoUrl').value = photo.url || '';
-                document.getElementById('imagePreview').classList.add('hidden');
-                
-                // Réactiver l'input file
-                document.getElementById('photoFile').disabled = false;
+                preview.classList.add('hidden');
             }
             
             photoModal.classList.remove('hidden');
