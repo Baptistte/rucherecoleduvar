@@ -113,6 +113,22 @@
                 opacity: 0;
             }
         }
+
+        /* Fallback pour AOS - assure que les éléments sont visibles */
+        .reveal {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* AOS pourra toujours animer si chargé */
+        [data-aos] {
+            opacity: 0;
+            transition-property: opacity, transform;
+        }
+
+        [data-aos].aos-animate {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="font-gotham bg-fond-clair text-seal">
@@ -245,11 +261,11 @@
         </section>
 
         <!-- 5. Section "Adhésion 2025 - Devenir Adhérent" -->
-        <section id="adhesion" class="py-16 md:py-20 bg-gradient-to-br from-wheat/30 to-white">
+        <section id="adhesion" class="py-16 md:py-20 bg-gradient-to-br from-wheat/30 to-white reveal">
             <div class="container mx-auto px-4 md:px-6">
                 <div class="max-w-3xl mx-auto">
                     <!-- Carte d'adhésion -->
-                    <div class="bg-white p-6 md:p-10 rounded-2xl shadow-2xl reveal border-4 border-miel">
+                    <div class="bg-white p-6 md:p-10 rounded-2xl shadow-2xl border-4 border-miel">
                         <!-- Titre principal -->
                         <div class="text-center mb-6 md:mb-8">
                             <h2 class="font-titre text-3xl md:text-4xl font-bold text-seal mb-2">
