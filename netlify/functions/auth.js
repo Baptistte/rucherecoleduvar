@@ -78,8 +78,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Validation de la taille du body
-    if (!event.body || event.body.length > 1024) {
+    // Validation de la taille du body (2048 pour couvrir l'inscription avec pseudo)
+    if (!event.body || event.body.length > 2048) {
       logSecurityEvent('INVALID_BODY_SIZE', clientIP);
       return {
         statusCode: 400,
@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
     const { action, email, password, token } = parsedBody;
 
     // Validation de l'action
-    if (!action || typeof action !== 'string' || !['login', 'verify'].includes(action)) {
+    if (!action || typeof action !== 'string' || !['login', 'verify', 'register'].includes(action)) {
       logSecurityEvent('INVALID_ACTION', clientIP, action);
       return {
         statusCode: 400,
@@ -224,6 +224,88 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ valid: false })
           };
         }
+
+      case 'register': {
+        // Validation des champs
+        const { pseudo } = parsedBody;
+
+        if (!isValidEmail(email) || !isValidPassword(password)) {
+          logSecurityEvent('REGISTER_INVALID_FORMAT', clientIP, email);
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Format email ou mot de passe invalide' })
+          };
+        }
+
+        if (password.length < 8) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Le mot de passe doit contenir au moins 8 caractères' })
+          };
+        }
+
+        if (pseudo && (typeof pseudo !== 'string' || pseudo.length > 50)) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Pseudo invalide (50 caractères max)' })
+          };
+        }
+
+        // Vérifier si l'email est déjà utilisé
+        const existing = await getUserByEmail(email);
+        if (existing) {
+          logSecurityEvent('REGISTER_EMAIL_EXISTS', clientIP, email);
+          return {
+            statusCode: 409,
+            headers,
+            body: JSON.stringify({ error: 'Un compte existe déjà avec cet email' })
+          };
+        }
+
+        // Hacher le mot de passe
+        const saltRounds = 12;
+        const password_hash = await require('bcryptjs').hash(password, saltRounds);
+
+        // Insérer l'utilisateur avec le rôle 'membre'
+        try {
+          await pool.query(
+            `INSERT INTO users (email, password_hash, role, pseudo) VALUES ($1, $2, 'membre', $3)
+             ON CONFLICT DO NOTHING`,
+            [email, password_hash, pseudo || null]
+          );
+        } catch (dbError) {
+          // Si la colonne pseudo n'existe pas encore, insérer sans
+          if (dbError.message.includes('pseudo')) {
+            await pool.query(
+              `INSERT INTO users (email, password_hash, role) VALUES ($1, $2, 'membre')`,
+              [email, password_hash]
+            );
+          } else {
+            throw dbError;
+          }
+        }
+
+        const registerToken = jwt.sign(
+          {
+            email,
+            role: 'membre',
+            iat: Math.floor(Date.now() / 1000),
+            ip: clientIP
+          },
+          JWT_SECRET,
+          { expiresIn: '8h' }
+        );
+
+        logSecurityEvent('REGISTER_SUCCESS', clientIP, email);
+        return {
+          statusCode: 201,
+          headers,
+          body: JSON.stringify({ token: registerToken, email })
+        };
+      }
 
       default:
         logSecurityEvent('UNKNOWN_ACTION', clientIP, action);

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petites Annonces - Rucher-École du Var</title>
+    <meta name="description" content="Petites annonces d'apiculture du Rucher-École du Var. Achat, vente et échange entre apiculteurs du Var.">
+    <link rel="canonical" href="https://rucherecoleduvar.com/annonces.html" />
+    <link rel="icon" href="assets/images/Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8', raw: '#816557', seal: '#561F04',
+                        gamboge: '#F6A01F', tigers: '#BA6E1F',
+                        miel: '#F6A01F', 'fond-clair': '#F5F5F5'
+                    },
+                    fontFamily: { titre: ['Montserrat', 'sans-serif'], corps: ['Lato', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#F6A01F 0%,#BA6E1F 100%); border-radius: 6px; border: 2px solid #f1f1f1; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg,#E6901F 0%,#AA5E1F 100%); }
+        html { scrollbar-width: thin; scrollbar-color: #F6A01F #f1f1f1; }
+
+        .card-annonce {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .card-annonce:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(86,31,4,0.12);
+        }
+        .badge-publiee  { background: #dcfce7; color: #166534; }
+        .badge-brouillon { background: #fef9c3; color: #713f12; }
+        .skeleton { background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    </style>
+</head>
+
+<body class="font-corps bg-fond-clair text-seal min-h-screen flex flex-col">
+
+<!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+<header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center font-titre text-2xl font-bold">
+            <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3">
+            <a href="index.html" class="hover:text-miel transition-colors">Rucher-École du VAR</a>
+        </div>
+        <div class="hidden md:flex space-x-6 items-center">
+            <a href="index.html" class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
+            <a href="formulaires.html" class="text-gray-600 hover:text-miel transition-colors">Formulaires</a>
+            <a href="galerie.html" class="text-gray-600 hover:text-miel transition-colors">Galerie</a>
+            <a href="planning.html" class="text-gray-600 hover:text-miel transition-colors">Planning</a>
+            <a href="annonces.html" class="text-miel font-bold border-b-2 border-miel transition-colors">Annonces</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-3">
+            <div id="navAuth" class="flex items-center space-x-3"></div>
+            <a href="annonce-form.html" id="btnPublier" class="hidden bg-miel text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors text-sm">
+                + Publier une annonce
+            </a>
+        </div>
+        <button id="mobile-menu-button" class="md:hidden text-gray-800 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+    </nav>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
+        <a href="index.html"       class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+        <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires</a>
+        <a href="galerie.html"     class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie</a>
+        <a href="planning.html"    class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
+        <a href="annonces.html"    class="block py-2 px-4 text-sm font-bold text-miel">Annonces</a>
+        <a href="annonce-form.html" class="block py-2 px-4 text-sm bg-miel/20 font-bold hover:bg-miel/40">+ Publier une annonce</a>
+        <a href="mon-compte.html"  class="block py-2 px-4 text-sm hover:bg-fond-clair">Mon compte</a>
+    </div>
+</header>
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<section class="bg-seal text-white py-12">
+    <div class="container mx-auto px-6 text-center">
+        <h1 class="font-titre text-4xl font-bold mb-3">Petites Annonces</h1>
+        <p class="text-wheat text-lg mb-6">Échangez, achetez et vendez entre apiculteurs du Var</p>
+        <a href="annonce-form.html" id="heroBtnPublier" class="hidden bg-miel text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-400 transition-colors">
+            + Publier une annonce
+        </a>
+        <a href="mon-compte.html" id="heroBtnCompte" class="hidden bg-white/10 border border-white/40 text-white font-bold py-3 px-8 rounded-full hover:bg-white/20 transition-colors ml-3">
+            Mon compte
+        </a>
+        <a href="mon-compte.html#inscription" id="heroBtnInscription" class="hidden bg-white/10 border border-white/40 text-white font-bold py-3 px-8 rounded-full hover:bg-white/20 transition-colors">
+            Connexion / Inscription
+        </a>
+    </div>
+</section>
+
+<!-- ── Filtres ─────────────────────────────────────────────────────────── -->
+<section class="bg-white border-b border-gray-200 py-4 sticky top-[72px] z-40 shadow-sm">
+    <div class="container mx-auto px-6">
+        <form id="filterForm" class="flex flex-col md:flex-row gap-3">
+            <div class="flex-1 relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+                <input type="text" id="searchInput" placeholder="Rechercher une annonce..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-miel focus:ring-1 focus:ring-miel text-sm">
+            </div>
+            <select id="villeSelect" class="border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-miel focus:ring-1 focus:ring-miel text-sm bg-white min-w-[160px]">
+                <option value="">Toutes les villes</option>
+            </select>
+            <select id="sortSelect" class="border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-miel focus:ring-1 focus:ring-miel text-sm bg-white min-w-[180px]">
+                <option value="recent">Plus récentes</option>
+                <option value="old">Plus anciennes</option>
+            </select>
+            <button type="submit" class="bg-miel text-black font-bold px-6 py-2.5 rounded-lg hover:bg-yellow-500 transition-colors text-sm">
+                Filtrer
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- ── Contenu principal ─────────────────────────────────────────────── -->
+<main class="flex-1 container mx-auto px-6 py-10">
+
+    <!-- Compteur & message vide -->
+    <div class="flex items-center justify-between mb-6">
+        <p id="resultsCount" class="text-raw text-sm"></p>
+    </div>
+
+    <!-- Grille de cartes -->
+    <div id="annoncesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Chargement initial : squelettes -->
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+        <div class="skeleton h-72 rounded-xl"></div>
+    </div>
+
+    <!-- Message aucun résultat -->
+    <div id="emptyState" class="hidden text-center py-20">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <h3 class="font-titre text-xl font-bold text-gray-400 mb-2">Aucune annonce trouvée</h3>
+        <p class="text-gray-400 mb-6">Essayez d'autres critères de recherche.</p>
+        <button onclick="resetFilters()" class="bg-miel text-black font-bold px-6 py-2 rounded-full hover:bg-yellow-500 transition-colors">
+            Réinitialiser les filtres
+        </button>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-10 flex justify-center items-center gap-2 flex-wrap"></div>
+</main>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────── -->
+<footer class="bg-seal text-white py-8 mt-auto">
+    <div class="container mx-auto px-6 text-center">
+        <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-10 w-auto mx-auto mb-3 opacity-80">
+        <p class="text-wheat text-sm">© 2025 Rucher-École du VAR — Saint-Raphaël</p>
+        <div class="mt-3 flex justify-center gap-6 text-sm text-wheat/70">
+            <a href="index.html" class="hover:text-white">Accueil</a>
+            <a href="annonces.html" class="hover:text-white">Annonces</a>
+            <a href="galerie.html" class="hover:text-white">Galerie</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const API_BASE = '/.netlify/functions';
+    let authToken = localStorage.getItem('authToken');
+    let currentPage = 1;
+    let currentFilters = {};
+
+    // ── Auth Nav ─────────────────────────────────────────────────────────
+    function updateNav(isConnected) {
+        const navAuth = document.getElementById('navAuth');
+        const btnPublier = document.getElementById('btnPublier');
+        const heroBtnPublier = document.getElementById('heroBtnPublier');
+        const heroBtnCompte = document.getElementById('heroBtnCompte');
+        const heroBtnInscription = document.getElementById('heroBtnInscription');
+
+        if (isConnected) {
+            navAuth.innerHTML = `
+                <a href="mon-compte.html" class="text-sm text-gray-600 hover:text-miel transition-colors">Mon compte</a>
+                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Déconnexion</button>
+            `;
+            btnPublier.classList.remove('hidden');
+            heroBtnPublier.classList.remove('hidden');
+            heroBtnCompte.classList.remove('hidden');
+        } else {
+            navAuth.innerHTML = `
+                <a href="mon-compte.html#inscription" class="text-sm text-gray-600 hover:text-miel transition-colors">Connexion</a>
+            `;
+            heroBtnInscription.classList.remove('hidden');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('authToken');
+        authToken = null;
+        updateNav(false);
+    }
+
+    async function checkAuth() {
+        if (!authToken) { updateNav(false); return; }
+        try {
+            const res = await fetch(`${API_BASE}/auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', token: authToken })
+            });
+            const data = await res.json();
+            updateNav(data.valid);
+            if (!data.valid) { localStorage.removeItem('authToken'); authToken = null; }
+        } catch { updateNav(false); }
+    }
+
+    // ── Chargement des annonces ──────────────────────────────────────────
+    async function loadAnnonces(page = 1, filters = {}) {
+        currentPage = page;
+        currentFilters = filters;
+        document.getElementById('annoncesList').innerHTML = `
+            ${Array(8).fill('<div class="skeleton h-72 rounded-xl"></div>').join('')}
+        `;
+
+        const params = new URLSearchParams();
+        if (filters.q)     params.set('q', filters.q);
+        if (filters.ville)  params.set('ville', filters.ville);
+        if (filters.sort)   params.set('sort', filters.sort);
+        params.set('page', page);
+
+        try {
+            const res = await fetch(`${API_BASE}/annonces?${params.toString()}`);
+            if (!res.ok) throw new Error('Erreur réseau');
+            const data = await res.json();
+
+            renderAnnonces(data.annonces);
+            renderPagination(data.page, data.totalPages);
+            document.getElementById('resultsCount').textContent =
+                data.total === 0 ? '' :
+                `${data.total} annonce${data.total > 1 ? 's' : ''} trouvée${data.total > 1 ? 's' : ''}`;
+
+            // Peupler le select des villes (seulement au premier chargement)
+            if (page === 1 && data.villes && data.villes.length) {
+                const villeSelect = document.getElementById('villeSelect');
+                const currentVille = filters.ville || '';
+                villeSelect.innerHTML = '<option value="">Toutes les villes</option>' +
+                    data.villes.map(v => `<option value="${escHtml(v)}" ${v === currentVille ? 'selected' : ''}>${escHtml(v)}</option>`).join('');
+            }
+        } catch (err) {
+            document.getElementById('annoncesList').innerHTML = `
+                <div class="col-span-full text-center py-16 text-red-500">
+                    <p class="font-bold">Erreur de chargement</p>
+                    <p class="text-sm mt-1">Veuillez réessayer dans quelques instants.</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderAnnonces(annonces) {
+        const container = document.getElementById('annoncesList');
+        const emptyState = document.getElementById('emptyState');
+
+        if (!annonces.length) {
+            container.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        container.innerHTML = annonces.map(a => {
+            const hasPhoto = a.first_photo && a.first_photo.data;
+            const photoHtml = hasPhoto
+                ? `<img src="data:${a.first_photo.mimeType};base64,${a.first_photo.data}" alt="${escHtml(a.titre)}" class="w-full h-full object-cover" loading="lazy">`
+                : `<div class="w-full h-full flex items-center justify-center bg-wheat/30">
+                     <svg class="w-12 h-12 text-tigers/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                   </div>`;
+
+            const photosCount = Number(a.photos_count) || 0;
+
+            return `
+            <a href="annonce-detail.html?id=${a.id}" class="card-annonce bg-white rounded-xl shadow-md overflow-hidden flex flex-col group">
+                <div class="relative h-44 overflow-hidden bg-fond-clair">
+                    ${photoHtml}
+                    ${photosCount > 1 ? `<span class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">📷 ${photosCount}</span>` : ''}
+                </div>
+                <div class="p-4 flex flex-col flex-1">
+                    <h2 class="font-titre font-bold text-seal group-hover:text-tigers transition-colors line-clamp-2 mb-1">${escHtml(a.titre)}</h2>
+                    <p class="text-raw text-sm line-clamp-2 flex-1 mb-3">${escHtml(a.description_preview || '')}</p>
+                    <div class="flex items-center justify-between text-xs text-gray-400 mt-auto">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            ${escHtml(a.ville)}
+                        </span>
+                        <span>${formatDate(a.created_at)}</span>
+                    </div>
+                </div>
+            </a>`;
+        }).join('');
+    }
+
+    function renderPagination(current, total) {
+        const container = document.getElementById('pagination');
+        if (total <= 1) { container.innerHTML = ''; return; }
+
+        const pages = [];
+        if (current > 1) pages.push(`<button onclick="changePage(${current - 1})" class="px-3 py-2 rounded-lg border border-gray-300 hover:border-miel hover:bg-miel/10 text-sm transition-colors">← Préc.</button>`);
+
+        for (let i = 1; i <= total; i++) {
+            if (i === current) {
+                pages.push(`<button class="px-3 py-2 rounded-lg bg-miel text-black font-bold text-sm">${i}</button>`);
+            } else if (i === 1 || i === total || (i >= current - 2 && i <= current + 2)) {
+                pages.push(`<button onclick="changePage(${i})" class="px-3 py-2 rounded-lg border border-gray-300 hover:border-miel hover:bg-miel/10 text-sm transition-colors">${i}</button>`);
+            } else if (i === current - 3 || i === current + 3) {
+                pages.push(`<span class="px-2 text-gray-400">…</span>`);
+            }
+        }
+
+        if (current < total) pages.push(`<button onclick="changePage(${current + 1})" class="px-3 py-2 rounded-lg border border-gray-300 hover:border-miel hover:bg-miel/10 text-sm transition-colors">Suiv. →</button>`);
+        container.innerHTML = pages.join('');
+    }
+
+    function changePage(page) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        loadAnnonces(page, currentFilters);
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('villeSelect').value = '';
+        document.getElementById('sortSelect').value = 'recent';
+        loadAnnonces(1, {});
+    }
+
+    // ── Utilitaires ──────────────────────────────────────────────────────
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        const diff = Math.floor((Date.now() - d) / 1000);
+        if (diff < 60) return 'À l\'instant';
+        if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+        if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+        if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ── Événements ────────────────────────────────────────────────────────
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    document.getElementById('filterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const filters = {
+            q:     document.getElementById('searchInput').value.trim(),
+            ville: document.getElementById('villeSelect').value,
+            sort:  document.getElementById('sortSelect').value
+        };
+        loadAnnonces(1, filters);
+    });
+
+    // Recherche en temps réel avec debounce
+    let debounceTimer;
+    document.getElementById('searchInput').addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            document.getElementById('filterForm').dispatchEvent(new Event('submit'));
+        }, 500);
+    });
+
+    // ── Init ─────────────────────────────────────────────────────────────
+    checkAuth();
+    loadAnnonces(1, {});
+</script>
+</body>
+</html>

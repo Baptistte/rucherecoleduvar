@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publier une annonce - Rucher-École du Var</title>
+    <meta name="description" content="Publiez votre petite annonce d'apiculture sur le site du Rucher-École du Var.">
+    <link rel="icon" href="assets/images/Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8', raw: '#816557', seal: '#561F04',
+                        gamboge: '#F6A01F', tigers: '#BA6E1F',
+                        miel: '#F6A01F', 'fond-clair': '#F5F5F5'
+                    },
+                    fontFamily: { titre: ['Montserrat', 'sans-serif'], corps: ['Lato', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#F6A01F 0%,#BA6E1F 100%); border-radius: 6px; border: 2px solid #f1f1f1; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg,#E6901F 0%,#AA5E1F 100%); }
+        html { scrollbar-width: thin; scrollbar-color: #F6A01F #f1f1f1; }
+
+        .field-group label { display: block; font-weight: 700; font-size: .875rem; color: #561F04; margin-bottom: .375rem; }
+        .field-group input,
+        .field-group textarea,
+        .field-group select {
+            width: 100%; border: 1.5px solid #e5e7eb; border-radius: .75rem; padding: .625rem .875rem;
+            font-family: 'Lato', sans-serif; font-size: .9rem; background: #fff;
+            transition: border-color .2s;
+        }
+        .field-group input:focus,
+        .field-group textarea:focus,
+        .field-group select:focus { outline: none; border-color: #F6A01F; box-shadow: 0 0 0 3px rgba(246,160,31,.12); }
+
+        .photo-thumb {
+            position: relative; width: 100px; height: 100px; border-radius: .75rem;
+            overflow: hidden; flex-shrink: 0; border: 2px solid #e5e7eb;
+        }
+        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-thumb .remove-btn {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,.6); color: #fff; border: none;
+            border-radius: 50%; width: 22px; height: 22px; font-size: 13px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            line-height: 1;
+        }
+        .photo-thumb .remove-btn:hover { background: rgba(220,38,38,.8); }
+
+        .drop-zone {
+            border: 2px dashed #BA6E1F; border-radius: 1rem; padding: 2rem;
+            text-align: center; cursor: pointer; transition: background .2s, border-color .2s;
+        }
+        .drop-zone:hover, .drop-zone.dragover { background: #FEF3C7; border-color: #F6A01F; }
+    </style>
+</head>
+
+<body class="font-corps bg-fond-clair text-seal min-h-screen flex flex-col">
+
+<!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+<header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center font-titre text-2xl font-bold">
+            <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3">
+            <a href="index.html" class="hover:text-miel transition-colors">Rucher-École du VAR</a>
+        </div>
+        <div class="hidden md:flex space-x-6 items-center">
+            <a href="index.html"       class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
+            <a href="galerie.html"     class="text-gray-600 hover:text-miel transition-colors">Galerie</a>
+            <a href="annonces.html"    class="text-miel font-bold border-b-2 border-miel">Annonces</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-3" id="navAuth"></div>
+        <button id="mobile-menu-button" class="md:hidden text-gray-800">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+    </nav>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
+        <a href="index.html"    class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+        <a href="galerie.html"  class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie</a>
+        <a href="annonces.html" class="block py-2 px-4 text-sm font-bold text-miel">Annonces</a>
+        <a href="mon-compte.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Mon compte</a>
+    </div>
+</header>
+
+<!-- ── Vérification auth en cours ──────────────────────────────────────── -->
+<div id="authLoading" class="flex-1 flex items-center justify-center py-20">
+    <div class="text-center">
+        <div class="inline-block w-10 h-10 border-4 border-miel border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-500">Vérification…</p>
+    </div>
+</div>
+
+<!-- ── Page non connecté ─────────────────────────────────────────────── -->
+<div id="notConnected" class="hidden flex-1 flex items-center justify-center py-20">
+    <div class="text-center max-w-md mx-auto px-6">
+        <div class="w-16 h-16 bg-miel/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-tigers" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h2 class="font-titre text-2xl font-bold mb-2">Connexion requise</h2>
+        <p class="text-raw mb-6">Vous devez être connecté pour publier une annonce.</p>
+        <a href="mon-compte.html#connexion" class="inline-block bg-miel text-black font-bold px-8 py-3 rounded-full hover:bg-yellow-500 transition-colors">
+            Se connecter
+        </a>
+        <p class="mt-4 text-sm text-gray-500">
+            Pas encore de compte ?
+            <a href="mon-compte.html#inscription" class="text-tigers hover:underline">S'inscrire</a>
+        </p>
+    </div>
+</div>
+
+<!-- ── Formulaire ─────────────────────────────────────────────────────── -->
+<main id="formSection" class="hidden flex-1 container mx-auto px-6 py-10 max-w-3xl">
+
+    <!-- Fil d'Ariane + titre -->
+    <div class="mb-8">
+        <nav class="text-sm text-gray-500 mb-3">
+            <a href="annonces.html" class="hover:text-miel transition-colors">← Retour aux annonces</a>
+        </nav>
+        <h1 id="pageTitle" class="font-titre text-3xl font-bold">Publier une annonce</h1>
+        <p class="text-raw mt-1">Remplissez les informations ci-dessous pour mettre en ligne votre annonce.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <form id="annonceForm" class="space-y-6" novalidate>
+
+        <!-- Titre -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 field-group">
+            <label for="titre">Titre de l'annonce <span class="text-red-500">*</span></label>
+            <input type="text" id="titre" name="titre" maxlength="200" placeholder="Ex : Vends ruche peuplée avec reine 2024..." required>
+            <p class="text-xs text-gray-400 mt-1.5"><span id="titreCount">0</span>/200 caractères</p>
+        </div>
+
+        <!-- Description -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 field-group">
+            <label for="description">Description <span class="text-red-500">*</span></label>
+            <textarea id="description" name="description" rows="7" maxlength="5000"
+                      placeholder="Décrivez votre annonce en détail : état, quantité, raison de la vente…" required></textarea>
+            <p class="text-xs text-gray-400 mt-1.5"><span id="descCount">0</span>/5000 caractères</p>
+        </div>
+
+        <!-- Localisation + Statut -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 grid grid-cols-1 sm:grid-cols-2 gap-5 field-group">
+            <div>
+                <label for="ville">Ville <span class="text-red-500">*</span></label>
+                <input type="text" id="ville" name="ville" maxlength="100" placeholder="Ex : Saint-Raphaël" required>
+            </div>
+            <div>
+                <label for="statut">Statut de l'annonce</label>
+                <select id="statut" name="statut">
+                    <option value="publiee">Publiée (visible immédiatement)</option>
+                    <option value="brouillon">Brouillon (masquée)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Coordonnées de contact -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 field-group">
+            <h2 class="font-titre text-lg font-bold mb-4">Coordonnées de contact</h2>
+            <p class="text-sm text-raw mb-4">Ces informations ne seront visibles que par les membres connectés.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label for="emailContact">Email de contact</label>
+                    <input type="email" id="emailContact" name="emailContact" maxlength="254" placeholder="contact@exemple.fr">
+                </div>
+                <div>
+                    <label for="telephoneContact">Téléphone</label>
+                    <input type="tel" id="telephoneContact" name="telephoneContact" maxlength="20" placeholder="06 12 34 56 78">
+                </div>
+            </div>
+        </div>
+
+        <!-- Photos -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <h2 class="font-titre text-lg font-bold mb-1">Photos <span class="text-sm font-normal text-gray-400">(optionnel — max 10)</span></h2>
+            <p class="text-sm text-raw mb-4">Formats acceptés : JPEG, PNG, WebP. Les images sont redimensionnées automatiquement.</p>
+
+            <!-- Zone de dépôt -->
+            <div id="dropZone" class="drop-zone mb-4">
+                <input type="file" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/webp" multiple class="hidden">
+                <svg class="w-10 h-10 text-tigers/50 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-raw font-medium">Glissez vos photos ici</p>
+                <p class="text-gray-400 text-sm mt-1">ou <button type="button" onclick="document.getElementById('photoInput').click()" class="text-tigers hover:underline">parcourir vos fichiers</button></p>
+            </div>
+
+            <!-- Prévisualisation -->
+            <div id="photoPreviews" class="flex gap-3 flex-wrap mt-2"></div>
+            <p id="photoCountMsg" class="text-xs text-gray-400 mt-2 hidden"><span id="photoCount">0</span>/10 photos</p>
+        </div>
+
+        <!-- Message d'erreur global -->
+        <div id="formError" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"></div>
+
+        <!-- Boutons -->
+        <div class="flex flex-col sm:flex-row gap-3 pb-6">
+            <button type="submit" id="submitBtn"
+                    class="flex-1 bg-miel text-black font-bold py-3 px-8 rounded-xl hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <span id="submitLabel">Publier l'annonce</span>
+            </button>
+            <a href="annonces.html" class="flex-1 text-center border border-gray-300 text-gray-600 py-3 px-8 rounded-xl hover:bg-fond-clair transition-colors">
+                Annuler
+            </a>
+        </div>
+    </form>
+</main>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────── -->
+<footer class="bg-seal text-white py-8 mt-auto">
+    <div class="container mx-auto px-6 text-center">
+        <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-10 w-auto mx-auto mb-3 opacity-80">
+        <p class="text-wheat text-sm">© 2025 Rucher-École du VAR — Saint-Raphaël</p>
+    </div>
+</footer>
+
+<script>
+    const API_BASE = '/.netlify/functions';
+    let authToken = localStorage.getItem('authToken');
+    let currentUser = null;
+    let uploadedPhotos = []; // [{ data, mimeType, fileName }]
+    let editingId = null;
+
+    const MAX_PHOTOS = 10;
+    const MAX_DIMENSION = 1200; // px — redimensionnement max
+    const JPEG_QUALITY = 0.82;
+
+    // ── Auth nav ─────────────────────────────────────────────────────────
+    function updateNav(isConnected) {
+        const navAuth = document.getElementById('navAuth');
+        if (isConnected) {
+            navAuth.innerHTML = `
+                <a href="mon-compte.html" class="text-sm text-gray-600 hover:text-miel transition-colors">Mon compte</a>
+                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Déconnexion</button>
+            `;
+        } else {
+            navAuth.innerHTML = `<a href="mon-compte.html#connexion" class="text-sm text-gray-600 hover:text-miel transition-colors">Connexion</a>`;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('authToken');
+        location.href = 'mon-compte.html#connexion';
+    }
+
+    async function checkAuth() {
+        if (!authToken) return false;
+        try {
+            const res = await fetch(`${API_BASE}/auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', token: authToken })
+            });
+            const data = await res.json();
+            if (data.valid) { currentUser = data.user; return true; }
+        } catch {}
+        localStorage.removeItem('authToken');
+        authToken = null;
+        return false;
+    }
+
+    async function init() {
+        const isConnected = await checkAuth();
+        updateNav(isConnected);
+        document.getElementById('authLoading').classList.add('hidden');
+
+        if (!isConnected) {
+            document.getElementById('notConnected').classList.remove('hidden');
+            return;
+        }
+
+        document.getElementById('formSection').classList.remove('hidden');
+
+        // Mode édition ?
+        const params = new URLSearchParams(window.location.search);
+        editingId = params.get('id');
+
+        if (editingId) {
+            document.getElementById('pageTitle').textContent = 'Modifier l\'annonce';
+            document.getElementById('submitLabel').textContent = 'Enregistrer les modifications';
+            await loadAnnonceForEdit(editingId);
+        }
+    }
+
+    // ── Chargement pour édition ──────────────────────────────────────────
+    async function loadAnnonceForEdit(id) {
+        try {
+            const res = await fetch(`${API_BASE}/annonces?id=${id}`, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            if (!res.ok) throw new Error('Introuvable');
+            const a = await res.json();
+
+            // Vérifier la propriété
+            if (a.user_email !== currentUser.email) {
+                alert('Vous n\'êtes pas autorisé à modifier cette annonce.');
+                location.href = 'mon-compte.html';
+                return;
+            }
+
+            // Pré-remplir
+            document.getElementById('titre').value = a.titre || '';
+            document.getElementById('description').value = a.description || '';
+            document.getElementById('ville').value = a.ville || '';
+            document.getElementById('statut').value = a.statut || 'publiee';
+            document.getElementById('emailContact').value = a.email_contact || '';
+            document.getElementById('telephoneContact').value = a.telephone_contact || '';
+
+            updateCharCount('titre', 'titreCount', 200);
+            updateCharCount('description', 'descCount', 5000);
+
+            // Photos existantes
+            if (Array.isArray(a.photos)) {
+                uploadedPhotos = a.photos;
+                renderPreviews();
+            }
+        } catch {
+            alert('Impossible de charger l\'annonce.');
+            location.href = 'annonces.html';
+        }
+    }
+
+    // ── Gestion des photos ────────────────────────────────────────────────
+    function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let { width, height } = img;
+
+                    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+                        width  = Math.round(width  * ratio);
+                        height = Math.round(height * ratio);
+                    }
+
+                    canvas.width  = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                    const dataUrl  = canvas.toDataURL(mimeType, JPEG_QUALITY);
+                    const base64   = dataUrl.split(',')[1];
+                    resolve({ data: base64, mimeType, fileName: file.name });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function addPhotos(files) {
+        const remaining = MAX_PHOTOS - uploadedPhotos.length;
+        if (remaining <= 0) {
+            showError(`Maximum ${MAX_PHOTOS} photos autorisées.`);
+            return;
+        }
+
+        const toProcess = Array.from(files).slice(0, remaining);
+        document.getElementById('submitBtn').disabled = true;
+
+        for (const file of toProcess) {
+            if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(file.type)) continue;
+            const compressed = await compressImage(file);
+            uploadedPhotos.push(compressed);
+        }
+
+        document.getElementById('submitBtn').disabled = false;
+        renderPreviews();
+    }
+
+    function removePhoto(index) {
+        uploadedPhotos.splice(index, 1);
+        renderPreviews();
+    }
+
+    function renderPreviews() {
+        const container = document.getElementById('photoPreviews');
+        const msg = document.getElementById('photoCountMsg');
+        const countEl = document.getElementById('photoCount');
+
+        if (uploadedPhotos.length === 0) {
+            container.innerHTML = '';
+            msg.classList.add('hidden');
+            return;
+        }
+
+        msg.classList.remove('hidden');
+        countEl.textContent = uploadedPhotos.length;
+
+        container.innerHTML = uploadedPhotos.map((p, i) => `
+            <div class="photo-thumb">
+                <img src="data:${p.mimeType};base64,${p.data}" alt="Photo ${i+1}">
+                <button type="button" class="remove-btn" onclick="removePhoto(${i})" title="Supprimer">✕</button>
+            </div>
+        `).join('');
+    }
+
+    // ── Drag & drop ──────────────────────────────────────────────────────
+    const dropZone = document.getElementById('dropZone');
+    const photoInput = document.getElementById('photoInput');
+
+    dropZone.addEventListener('click', () => photoInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        addPhotos(e.dataTransfer.files);
+    });
+    photoInput.addEventListener('change', (e) => addPhotos(e.target.files));
+
+    // ── Compteurs de caractères ──────────────────────────────────────────
+    function updateCharCount(inputId, countId, max) {
+        const el = document.getElementById(inputId);
+        document.getElementById(countId).textContent = el.value.length;
+    }
+
+    document.getElementById('titre').addEventListener('input', () => updateCharCount('titre', 'titreCount', 200));
+    document.getElementById('description').addEventListener('input', () => updateCharCount('description', 'descCount', 5000));
+
+    // ── Soumission du formulaire ─────────────────────────────────────────
+    function showError(msg) {
+        const el = document.getElementById('formError');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideError() {
+        document.getElementById('formError').classList.add('hidden');
+    }
+
+    document.getElementById('annonceForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideError();
+
+        const titre       = document.getElementById('titre').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const ville       = document.getElementById('ville').value.trim();
+        const statut      = document.getElementById('statut').value;
+        const emailContact       = document.getElementById('emailContact').value.trim();
+        const telephoneContact   = document.getElementById('telephoneContact').value.trim();
+
+        // Validation client
+        if (titre.length < 3) { showError('Le titre doit comporter au moins 3 caractères.'); return; }
+        if (description.length < 10) { showError('La description doit comporter au moins 10 caractères.'); return; }
+        if (ville.length < 2) { showError('Veuillez indiquer une ville.'); return; }
+
+        const btn = document.getElementById('submitBtn');
+        const label = document.getElementById('submitLabel');
+        btn.disabled = true;
+        label.textContent = 'Envoi en cours…';
+
+        const payload = {
+            titre, description, ville, statut,
+            emailContact:       emailContact || null,
+            telephoneContact:   telephoneContact || null,
+            photos: uploadedPhotos
+        };
+
+        try {
+            let res;
+            if (editingId) {
+                payload.id = Number(editingId);
+                res = await fetch(`${API_BASE}/annonces`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                res = await fetch(`${API_BASE}/annonces`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                showError(data.error || 'Une erreur est survenue.');
+                btn.disabled = false;
+                label.textContent = editingId ? 'Enregistrer les modifications' : 'Publier l\'annonce';
+                return;
+            }
+
+            // Succès → rediriger
+            location.href = editingId ? `annonce-detail.html?id=${editingId}` : `annonce-detail.html?id=${data.id}`;
+
+        } catch {
+            showError('Erreur de connexion. Vérifiez votre connexion Internet et réessayez.');
+            btn.disabled = false;
+            label.textContent = editingId ? 'Enregistrer les modifications' : 'Publier l\'annonce';
+        }
+    });
+
+    // ── Événements ────────────────────────────────────────────────────────
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // ── Init ─────────────────────────────────────────────────────────────
+    init();
+</script>
+</body>
+</html>

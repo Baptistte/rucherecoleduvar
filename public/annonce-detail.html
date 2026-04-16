@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annonce - Rucher-École du Var</title>
+    <meta name="description" content="Détail d'une annonce du Rucher-École du Var.">
+    <link rel="icon" href="assets/images/Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wheat: '#E8D7A8', raw: '#816557', seal: '#561F04',
+                        gamboge: '#F6A01F', tigers: '#BA6E1F',
+                        miel: '#F6A01F', 'fond-clair': '#F5F5F5'
+                    },
+                    fontFamily: { titre: ['Montserrat', 'sans-serif'], corps: ['Lato', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#F6A01F 0%,#BA6E1F 100%); border-radius: 6px; border: 2px solid #f1f1f1; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg,#E6901F 0%,#AA5E1F 100%); }
+        html { scrollbar-width: thin; scrollbar-color: #F6A01F #f1f1f1; }
+
+        .gallery-thumb { cursor: pointer; transition: opacity .2s, ring .2s; }
+        .gallery-thumb:hover { opacity: .8; }
+        .gallery-thumb.active { ring: 2px; ring-offset: 2px; ring-color: #F6A01F; outline: 2px solid #F6A01F; }
+
+        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 1000; align-items: center; justify-content: center; }
+        #lightbox.open { display: flex; }
+        #lightbox img { max-height: 90vh; max-width: 90vw; object-fit: contain; border-radius: 8px; }
+    </style>
+</head>
+
+<body class="font-corps bg-fond-clair text-seal min-h-screen flex flex-col">
+
+<!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+<header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center font-titre text-2xl font-bold">
+            <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3">
+            <a href="index.html" class="hover:text-miel transition-colors">Rucher-École du VAR</a>
+        </div>
+        <div class="hidden md:flex space-x-6 items-center">
+            <a href="index.html"       class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
+            <a href="formulaires.html" class="text-gray-600 hover:text-miel transition-colors">Formulaires</a>
+            <a href="galerie.html"     class="text-gray-600 hover:text-miel transition-colors">Galerie</a>
+            <a href="planning.html"    class="text-gray-600 hover:text-miel transition-colors">Planning</a>
+            <a href="annonces.html"    class="text-miel font-bold border-b-2 border-miel">Annonces</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-3" id="navAuth"></div>
+        <button id="mobile-menu-button" class="md:hidden text-gray-800">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+    </nav>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
+        <a href="index.html"       class="block py-2 px-4 text-sm hover:bg-fond-clair">Accueil</a>
+        <a href="formulaires.html" class="block py-2 px-4 text-sm hover:bg-fond-clair">Formulaires</a>
+        <a href="galerie.html"     class="block py-2 px-4 text-sm hover:bg-fond-clair">Galerie</a>
+        <a href="planning.html"    class="block py-2 px-4 text-sm hover:bg-fond-clair">Planning</a>
+        <a href="annonces.html"    class="block py-2 px-4 text-sm font-bold text-miel">Annonces</a>
+        <a href="mon-compte.html"  class="block py-2 px-4 text-sm hover:bg-fond-clair">Mon compte</a>
+    </div>
+</header>
+
+<!-- ── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<div class="container mx-auto px-6 py-4">
+    <nav class="text-sm text-gray-500 flex items-center gap-2">
+        <a href="annonces.html" class="hover:text-miel transition-colors">← Toutes les annonces</a>
+    </nav>
+</div>
+
+<!-- ── Contenu ────────────────────────────────────────────────────────────── -->
+<main class="flex-1 container mx-auto px-6 pb-12">
+
+    <!-- État de chargement -->
+    <div id="loadingState" class="py-20 text-center">
+        <div class="inline-block w-10 h-10 border-4 border-miel border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-500">Chargement…</p>
+    </div>
+
+    <!-- Erreur -->
+    <div id="errorState" class="hidden py-20 text-center">
+        <p class="text-red-500 font-bold text-xl mb-2">Annonce introuvable</p>
+        <p class="text-gray-500 mb-6">Cette annonce n'existe pas ou a été supprimée.</p>
+        <a href="annonces.html" class="bg-miel text-black font-bold px-6 py-2 rounded-full hover:bg-yellow-500 transition-colors">Retour aux annonces</a>
+    </div>
+
+    <!-- Annonce -->
+    <article id="annonceContent" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Colonne gauche : galerie + description -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Galerie photo -->
+                <div id="gallerySection" class="hidden bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <!-- Image principale -->
+                    <div class="relative aspect-video bg-fond-clair">
+                        <img id="mainPhoto" src="" alt="" class="w-full h-full object-contain">
+                        <button id="lightboxBtn" class="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full hover:bg-black/70 transition-colors">
+                            ⛶ Agrandir
+                        </button>
+                    </div>
+                    <!-- Miniatures -->
+                    <div id="thumbsContainer" class="flex gap-2 p-3 overflow-x-auto bg-white"></div>
+                </div>
+
+                <!-- Image placeholder si pas de photo -->
+                <div id="noPhotoPlaceholder" class="hidden bg-wheat/20 rounded-2xl h-48 flex items-center justify-center">
+                    <div class="text-center text-tigers/50">
+                        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p class="text-sm">Pas de photo</p>
+                    </div>
+                </div>
+
+                <!-- Titre + meta -->
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <h1 id="annonceTitre" class="font-titre text-2xl md:text-3xl font-bold leading-tight"></h1>
+                        <div id="ownerActions" class="hidden flex-shrink-0 flex gap-2">
+                            <a id="editBtn" href="#" class="text-sm bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">Modifier</a>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-miel" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span id="annonceVille" class="font-medium text-seal"></span>
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span id="annonceDate"></span>
+                        </span>
+                    </div>
+                    <!-- Description -->
+                    <div class="prose prose-sm max-w-none text-raw leading-relaxed">
+                        <h2 class="font-titre text-lg font-bold text-seal mb-3">Description</h2>
+                        <p id="annonceDescription" class="whitespace-pre-line"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite : contact -->
+            <div class="space-y-4">
+
+                <!-- Bloc contact -->
+                <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
+                    <h2 class="font-titre text-lg font-bold mb-4">Contacter l'annonceur</h2>
+
+                    <!-- Connecté → afficher les coordonnées -->
+                    <div id="contactConnected" class="hidden space-y-3">
+                        <div id="contactEmail" class="hidden items-center gap-3 p-3 bg-fond-clair rounded-xl">
+                            <div class="w-8 h-8 bg-miel/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-tigers" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-0.5">Email</p>
+                                <a id="emailLink" href="#" class="text-seal font-medium hover:text-tigers transition-colors text-sm break-all"></a>
+                            </div>
+                        </div>
+                        <div id="contactPhone" class="hidden items-center gap-3 p-3 bg-fond-clair rounded-xl">
+                            <div class="w-8 h-8 bg-miel/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-tigers" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-0.5">Téléphone</p>
+                                <a id="phoneLink" href="#" class="text-seal font-medium hover:text-tigers transition-colors text-sm"></a>
+                            </div>
+                        </div>
+                        <div id="noContactInfo" class="hidden text-sm text-gray-400 text-center py-2">
+                            L'annonceur n'a pas fourni de coordonnées.
+                        </div>
+                    </div>
+
+                    <!-- Non connecté → incitation à la connexion -->
+                    <div id="contactHidden" class="hidden text-center py-4">
+                        <div class="w-12 h-12 bg-miel/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-tigers" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">Connectez-vous pour voir les coordonnées de l'annonceur.</p>
+                        <a href="mon-compte.html#connexion" class="block w-full bg-miel text-black font-bold py-2.5 px-4 rounded-xl hover:bg-yellow-500 transition-colors text-sm text-center">
+                            Se connecter
+                        </a>
+                        <a href="mon-compte.html#inscription" class="block w-full mt-2 border border-gray-300 text-gray-600 py-2.5 px-4 rounded-xl hover:bg-fond-clair transition-colors text-sm text-center">
+                            Créer un compte
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Signaler -->
+                <div class="bg-white rounded-2xl shadow-sm p-4 text-center">
+                    <a href="annonces.html" class="text-sm text-gray-400 hover:text-seal transition-colors flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Retour aux annonces
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+</main>
+
+<!-- ── Lightbox ────────────────────────────────────────────────────────────── -->
+<div id="lightbox" onclick="closeLightbox()">
+    <button onclick="event.stopPropagation(); closeLightbox()" class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-miel">✕</button>
+    <button onclick="event.stopPropagation(); prevPhoto()" class="absolute left-4 text-white text-4xl leading-none hover:text-miel px-2">‹</button>
+    <img id="lightboxImg" src="" alt="">
+    <button onclick="event.stopPropagation(); nextPhoto()" class="absolute right-4 text-white text-4xl leading-none hover:text-miel px-2">›</button>
+    <span id="lightboxCounter" class="absolute bottom-4 text-white/70 text-sm"></span>
+</div>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────── -->
+<footer class="bg-seal text-white py-8 mt-auto">
+    <div class="container mx-auto px-6 text-center">
+        <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-10 w-auto mx-auto mb-3 opacity-80">
+        <p class="text-wheat text-sm">© 2025 Rucher-École du VAR — Saint-Raphaël</p>
+    </div>
+</footer>
+
+<script>
+    const API_BASE = '/.netlify/functions';
+    let authToken = localStorage.getItem('authToken');
+    let currentUser = null;
+    let photos = [];
+    let currentPhotoIndex = 0;
+
+    // ── Auth nav ─────────────────────────────────────────────────────────
+    function updateNav(isConnected) {
+        const navAuth = document.getElementById('navAuth');
+        if (isConnected) {
+            navAuth.innerHTML = `
+                <a href="mon-compte.html" class="text-sm text-gray-600 hover:text-miel transition-colors">Mon compte</a>
+                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Déconnexion</button>
+            `;
+        } else {
+            navAuth.innerHTML = `<a href="mon-compte.html#connexion" class="text-sm text-gray-600 hover:text-miel transition-colors">Connexion</a>`;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('authToken');
+        authToken = null;
+        currentUser = null;
+        updateNav(false);
+        location.reload();
+    }
+
+    async function checkAuth() {
+        if (!authToken) { updateNav(false); return false; }
+        try {
+            const res = await fetch(`${API_BASE}/auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', token: authToken })
+            });
+            const data = await res.json();
+            if (data.valid) {
+                currentUser = data.user;
+                updateNav(true);
+                return true;
+            }
+        } catch {}
+        localStorage.removeItem('authToken');
+        authToken = null;
+        updateNav(false);
+        return false;
+    }
+
+    // ── Chargement de l'annonce ──────────────────────────────────────────
+    async function loadAnnonce() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        if (!id || isNaN(Number(id))) {
+            showError();
+            return;
+        }
+
+        const isConnected = await checkAuth();
+
+        try {
+            const res = await fetch(`${API_BASE}/annonces?id=${id}`, {
+                headers: authToken ? { Authorization: `Bearer ${authToken}` } : {}
+            });
+
+            if (!res.ok) { showError(); return; }
+            const annonce = await res.json();
+            renderAnnonce(annonce, isConnected);
+        } catch {
+            showError();
+        }
+    }
+
+    function showError() {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    function renderAnnonce(a, isConnected) {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('annonceContent').classList.remove('hidden');
+
+        // Mettre à jour le titre de la page
+        document.title = `${escHtml(a.titre)} — Rucher-École du Var`;
+
+        // Titre & meta
+        document.getElementById('annonceTitre').textContent = a.titre;
+        document.getElementById('annonceVille').textContent = a.ville;
+        document.getElementById('annonceDate').textContent = formatDate(a.created_at);
+        document.getElementById('annonceDescription').textContent = a.description;
+
+        // Photos
+        photos = Array.isArray(a.photos) ? a.photos : [];
+        if (photos.length > 0) {
+            document.getElementById('gallerySection').classList.remove('hidden');
+            setupGallery();
+        } else {
+            document.getElementById('noPhotoPlaceholder').classList.remove('hidden');
+        }
+
+        // Actions propriétaire
+        if (isConnected && currentUser && currentUser.email === a.user_email) {
+            const ownerActions = document.getElementById('ownerActions');
+            ownerActions.classList.remove('hidden');
+            document.getElementById('editBtn').href = `annonce-form.html?id=${a.id}`;
+        }
+
+        // Coordonnées de contact
+        if (isConnected) {
+            document.getElementById('contactConnected').classList.remove('hidden');
+
+            if (a.email_contact) {
+                const emailEl = document.getElementById('contactEmail');
+                emailEl.classList.remove('hidden');
+                emailEl.classList.add('flex');
+                const emailLink = document.getElementById('emailLink');
+                emailLink.href = `mailto:${a.email_contact}`;
+                emailLink.textContent = a.email_contact;
+            }
+
+            if (a.telephone_contact) {
+                const phoneEl = document.getElementById('contactPhone');
+                phoneEl.classList.remove('hidden');
+                phoneEl.classList.add('flex');
+                const phoneLink = document.getElementById('phoneLink');
+                phoneLink.href = `tel:${a.telephone_contact.replace(/\s/g, '')}`;
+                phoneLink.textContent = a.telephone_contact;
+            }
+
+            if (!a.email_contact && !a.telephone_contact) {
+                document.getElementById('noContactInfo').classList.remove('hidden');
+            }
+        } else {
+            document.getElementById('contactHidden').classList.remove('hidden');
+        }
+    }
+
+    // ── Galerie ──────────────────────────────────────────────────────────
+    function setupGallery() {
+        const mainImg = document.getElementById('mainPhoto');
+        const thumbsContainer = document.getElementById('thumbsContainer');
+
+        setMainPhoto(0);
+
+        if (photos.length > 1) {
+            thumbsContainer.innerHTML = photos.map((p, i) => `
+                <img src="data:${p.mimeType};base64,${p.data}"
+                     alt="Photo ${i+1}"
+                     class="gallery-thumb h-16 w-20 object-cover rounded-lg flex-shrink-0 ${i===0 ? 'active' : ''}"
+                     onclick="setMainPhoto(${i})"
+                     loading="lazy">
+            `).join('');
+        }
+
+        document.getElementById('lightboxBtn').addEventListener('click', () => openLightbox(currentPhotoIndex));
+    }
+
+    function setMainPhoto(index) {
+        currentPhotoIndex = index;
+        const p = photos[index];
+        const mainImg = document.getElementById('mainPhoto');
+        mainImg.src = `data:${p.mimeType};base64,${p.data}`;
+        mainImg.alt = `Photo ${index + 1}`;
+
+        document.querySelectorAll('.gallery-thumb').forEach((el, i) => {
+            el.classList.toggle('active', i === index);
+        });
+    }
+
+    // ── Lightbox ─────────────────────────────────────────────────────────
+    function openLightbox(index) {
+        currentPhotoIndex = index;
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightboxImg');
+        const p = photos[index];
+        lbImg.src = `data:${p.mimeType};base64,${p.data}`;
+        lbImg.alt = `Photo ${index + 1}`;
+        document.getElementById('lightboxCounter').textContent = photos.length > 1 ? `${index + 1} / ${photos.length}` : '';
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function prevPhoto() {
+        openLightbox((currentPhotoIndex - 1 + photos.length) % photos.length);
+    }
+
+    function nextPhoto() {
+        openLightbox((currentPhotoIndex + 1) % photos.length);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (!document.getElementById('lightbox').classList.contains('open')) return;
+        if (e.key === 'ArrowLeft')  prevPhoto();
+        if (e.key === 'ArrowRight') nextPhoto();
+        if (e.key === 'Escape')     closeLightbox();
+    });
+
+    // ── Utilitaires ──────────────────────────────────────────────────────
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // ── Événements ────────────────────────────────────────────────────────
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // ── Init ─────────────────────────────────────────────────────────────
+    loadAnnonce();
+</script>
+</body>
+</html>
