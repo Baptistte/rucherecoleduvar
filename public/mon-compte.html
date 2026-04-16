@@ -33,24 +33,46 @@
         ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg,#E6901F 0%,#AA5E1F 100%); }
         html { scrollbar-width: thin; scrollbar-color: #F6A01F #f1f1f1; }
 
+        /* Champs de formulaire */
         .field-group label { display: block; font-weight: 700; font-size: .875rem; color: #561F04; margin-bottom: .375rem; }
         .field-group input {
-            width: 100%; border: 1.5px solid #e5e7eb; border-radius: .75rem; padding: .625rem .875rem;
+            width: 100%; border: 1.5px solid #e5e7eb; border-radius: .75rem;
+            padding: .625rem .875rem; padding-right: 2.75rem;
             font-family: 'Lato', sans-serif; font-size: .9rem; background: #fff; transition: border-color .2s;
         }
         .field-group input:focus { outline: none; border-color: #F6A01F; box-shadow: 0 0 0 3px rgba(246,160,31,.12); }
 
+        /* Wrapper position relative pour le bouton œil */
+        .pw-wrapper { position: relative; }
+        .pw-toggle {
+            position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: #9ca3af; padding: 2px;
+            transition: color .2s;
+        }
+        .pw-toggle:hover { color: #561F04; }
+
+        /* Onglets */
         .tab-btn { transition: color .2s, border-color .2s; }
         .tab-btn.active { color: #F6A01F; border-bottom-color: #F6A01F; }
 
+        /* Indicateur de force du mot de passe */
+        .strength-item { display: flex; align-items: center; gap: .375rem; font-size: .78rem; transition: color .2s; }
+        .strength-item .check-icon { flex-shrink: 0; width: 14px; height: 14px; }
+        .strength-item.ok   { color: #166534; }
+        .strength-item.fail { color: #9ca3af; }
+
+        /* Liste annonces */
         .annonce-row { transition: box-shadow .2s; }
         .annonce-row:hover { box-shadow: 0 4px 12px rgba(86,31,4,.08); }
-
         .badge-publiee  { background: #dcfce7; color: #166534; }
         .badge-brouillon { background: #fef9c3; color: #713f12; }
 
+        /* Squelettes */
         .skeleton { background: linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
         @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+
+        /* Boutons d'action — wrapping mobile */
+        .action-btns { display: flex; flex-wrap: wrap; gap: .5rem; }
     </style>
 </head>
 
@@ -58,10 +80,10 @@
 
 <!-- ── Navigation ─────────────────────────────────────────────────────────── -->
 <header class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
-    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <div class="flex items-center font-titre text-2xl font-bold">
-            <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-12 w-auto mr-3">
-            <a href="index.html" class="hover:text-miel transition-colors">Rucher-École du VAR</a>
+    <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center font-titre text-xl sm:text-2xl font-bold min-w-0">
+            <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" loading="lazy" class="h-10 sm:h-12 w-auto mr-2 sm:mr-3 flex-shrink-0">
+            <a href="index.html" class="hover:text-miel transition-colors truncate">Rucher-École du VAR</a>
         </div>
         <div class="hidden md:flex space-x-6 items-center">
             <a href="index.html"       class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
@@ -70,7 +92,7 @@
             <a href="mon-compte.html"  class="text-miel font-bold border-b-2 border-miel">Mon compte</a>
         </div>
         <div class="hidden md:flex items-center space-x-3" id="navAuth"></div>
-        <button id="mobile-menu-button" class="md:hidden text-gray-800">
+        <button id="mobile-menu-button" class="md:hidden text-gray-800 p-1 flex-shrink-0">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
         </button>
     </nav>
@@ -85,21 +107,22 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <!-- VUE : Non connecté (Connexion / Inscription)                               -->
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="authView" class="hidden flex-1 flex items-start justify-center py-12 px-4">
+<div id="authView" class="hidden flex-1 flex items-start justify-center py-8 px-4">
     <div class="w-full max-w-md">
 
-        <!-- Onglets connexion / inscription -->
-        <div class="flex border-b border-gray-200 mb-6">
+        <!-- Onglets -->
+        <div class="flex border-b border-gray-200 mb-5">
             <button id="tabConnexion" class="tab-btn flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 active" onclick="switchTab('connexion')">Connexion</button>
             <button id="tabInscription" class="tab-btn flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500" onclick="switchTab('inscription')">Inscription</button>
         </div>
 
-        <!-- Formulaire de connexion -->
-        <div id="loginPanel" class="bg-white rounded-2xl shadow-sm p-8">
-            <div class="flex justify-center mb-6">
-                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-14 w-auto">
+        <!-- ── Formulaire de connexion ── -->
+        <div id="loginPanel" class="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
+            <div class="flex justify-center mb-5">
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-12 sm:h-14 w-auto">
             </div>
-            <h2 class="font-titre text-2xl font-bold text-center mb-6">Connexion</h2>
+            <h2 class="font-titre text-xl sm:text-2xl font-bold text-center mb-5">Connexion</h2>
+
             <form id="loginForm" class="space-y-4 field-group" novalidate>
                 <div>
                     <label for="loginEmail">Email</label>
@@ -107,28 +130,36 @@
                 </div>
                 <div>
                     <label for="loginPassword">Mot de passe</label>
-                    <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••">
+                    <div class="pw-wrapper">
+                        <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••">
+                        <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)" aria-label="Afficher le mot de passe">
+                            <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg class="w-5 h-5 eye-closed hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
                 </div>
                 <div id="loginError" class="hidden text-red-600 text-sm bg-red-50 p-3 rounded-lg"></div>
                 <button type="submit" id="loginBtn" class="w-full bg-miel text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors">
                     Se connecter
                 </button>
             </form>
+
             <p class="text-center text-sm text-gray-500 mt-4">
                 Pas encore de compte ?
                 <button onclick="switchTab('inscription')" class="text-tigers hover:underline font-medium">S'inscrire</button>
             </p>
         </div>
 
-        <!-- Formulaire d'inscription -->
-        <div id="registerPanel" class="hidden bg-white rounded-2xl shadow-sm p-8">
-            <div class="flex justify-center mb-6">
-                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-14 w-auto">
+        <!-- ── Formulaire d'inscription ── -->
+        <div id="registerPanel" class="hidden bg-white rounded-2xl shadow-sm p-6 sm:p-8">
+            <div class="flex justify-center mb-5">
+                <img src="assets/images/Sans-titrelogo-seul-removebg-preview.png" alt="Logo" class="h-12 sm:h-14 w-auto">
             </div>
-            <h2 class="font-titre text-2xl font-bold text-center mb-6">Créer un compte</h2>
+            <h2 class="font-titre text-xl sm:text-2xl font-bold text-center mb-5">Créer un compte</h2>
+
             <form id="registerForm" class="space-y-4 field-group" novalidate>
                 <div>
-                    <label for="regPseudo">Pseudo (optionnel)</label>
+                    <label for="regPseudo">Pseudo <span class="text-gray-400 font-normal">(optionnel)</span></label>
                     <input type="text" id="regPseudo" maxlength="50" placeholder="Apiculteur83">
                 </div>
                 <div>
@@ -137,17 +168,49 @@
                 </div>
                 <div>
                     <label for="regPassword">Mot de passe <span class="text-red-500">*</span></label>
-                    <input type="password" id="regPassword" autocomplete="new-password" required placeholder="Minimum 8 caractères">
+                    <div class="pw-wrapper">
+                        <input type="password" id="regPassword" autocomplete="new-password" required placeholder="Minimum 8 caractères" oninput="updateStrength(this.value)">
+                        <button type="button" class="pw-toggle" onclick="togglePw('regPassword', this)" aria-label="Afficher le mot de passe">
+                            <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg class="w-5 h-5 eye-closed hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
+                    <!-- Indicateur de force -->
+                    <div id="strengthIndicator" class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 hidden">
+                        <span class="strength-item fail" id="sc-length">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            8 caractères min.
+                        </span>
+                        <span class="strength-item fail" id="sc-upper">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            1 majuscule
+                        </span>
+                        <span class="strength-item fail" id="sc-digit">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            1 chiffre
+                        </span>
+                        <span class="strength-item fail" id="sc-special">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            2 caractères spéciaux
+                        </span>
+                    </div>
                 </div>
                 <div>
                     <label for="regPasswordConfirm">Confirmer le mot de passe <span class="text-red-500">*</span></label>
-                    <input type="password" id="regPasswordConfirm" autocomplete="new-password" required placeholder="••••••••">
+                    <div class="pw-wrapper">
+                        <input type="password" id="regPasswordConfirm" autocomplete="new-password" required placeholder="••••••••">
+                        <button type="button" class="pw-toggle" onclick="togglePw('regPasswordConfirm', this)" aria-label="Afficher le mot de passe">
+                            <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg class="w-5 h-5 eye-closed hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
                 </div>
                 <div id="registerError" class="hidden text-red-600 text-sm bg-red-50 p-3 rounded-lg"></div>
                 <button type="submit" id="registerBtn" class="w-full bg-miel text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors">
                     Créer mon compte
                 </button>
             </form>
+
             <p class="text-center text-sm text-gray-500 mt-4">
                 Déjà un compte ?
                 <button onclick="switchTab('connexion')" class="text-tigers hover:underline font-medium">Se connecter</button>
@@ -159,59 +222,56 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <!-- VUE : Tableau de bord (connecté)                                           -->
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<main id="dashboardView" class="hidden flex-1 container mx-auto px-6 py-10">
+<main id="dashboardView" class="hidden flex-1 container mx-auto px-4 sm:px-6 py-8">
 
     <!-- Header du compte -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-            <h1 class="font-titre text-3xl font-bold">Mon espace</h1>
-            <p id="userGreeting" class="text-raw mt-1 text-sm"></p>
+            <h1 class="font-titre text-2xl sm:text-3xl font-bold">Mon espace</h1>
+            <p id="userGreeting" class="text-raw mt-1 text-sm break-all"></p>
         </div>
-        <div class="flex gap-3">
-            <a href="annonce-form.html" class="bg-miel text-black font-bold py-2.5 px-5 rounded-full hover:bg-yellow-500 transition-colors text-sm">
+        <div class="flex gap-2 flex-wrap">
+            <a href="annonce-form.html" class="bg-miel text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors text-sm whitespace-nowrap">
                 + Nouvelle annonce
             </a>
-            <button onclick="logout()" class="border border-gray-300 text-gray-600 py-2.5 px-5 rounded-full hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors text-sm">
+            <button onclick="logout()" class="border border-gray-300 text-gray-600 py-2 px-4 rounded-full hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors text-sm whitespace-nowrap">
                 Déconnexion
             </button>
         </div>
     </div>
 
     <!-- Stats rapides -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-        <div class="bg-white rounded-2xl shadow-sm p-5 text-center">
-            <p id="statTotal" class="font-titre text-3xl font-bold text-miel">—</p>
-            <p class="text-sm text-raw mt-1">Annonces au total</p>
+    <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-center">
+            <p id="statTotal" class="font-titre text-2xl sm:text-3xl font-bold text-miel">—</p>
+            <p class="text-xs sm:text-sm text-raw mt-1">Total</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-5 text-center">
-            <p id="statPubees" class="font-titre text-3xl font-bold text-green-600">—</p>
-            <p class="text-sm text-raw mt-1">Publiées</p>
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-center">
+            <p id="statPubees" class="font-titre text-2xl sm:text-3xl font-bold text-green-600">—</p>
+            <p class="text-xs sm:text-sm text-raw mt-1">Publiées</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-5 text-center col-span-2 sm:col-span-1">
-            <p id="statBrouillons" class="font-titre text-3xl font-bold text-yellow-600">—</p>
-            <p class="text-sm text-raw mt-1">En pause</p>
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-center">
+            <p id="statBrouillons" class="font-titre text-2xl sm:text-3xl font-bold text-yellow-600">—</p>
+            <p class="text-xs sm:text-sm text-raw mt-1">En pause</p>
         </div>
     </div>
 
     <!-- Liste de mes annonces -->
     <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="font-titre text-xl font-bold">Mes annonces</h2>
-            <a href="annonces.html" class="text-sm text-tigers hover:underline">Voir la liste publique →</a>
+        <div class="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between gap-2">
+            <h2 class="font-titre text-lg sm:text-xl font-bold">Mes annonces</h2>
+            <a href="annonces.html" class="text-sm text-tigers hover:underline whitespace-nowrap">Liste publique →</a>
         </div>
 
-        <!-- Chargement -->
         <div id="annonceLoading" class="p-6 space-y-3">
             <div class="skeleton h-20 rounded-xl"></div>
             <div class="skeleton h-20 rounded-xl"></div>
             <div class="skeleton h-20 rounded-xl"></div>
         </div>
 
-        <!-- Liste -->
         <div id="annoncesList" class="hidden divide-y divide-gray-100"></div>
 
-        <!-- Vide -->
-        <div id="annoncesEmpty" class="hidden p-12 text-center">
+        <div id="annoncesEmpty" class="hidden p-10 sm:p-12 text-center">
             <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
@@ -225,14 +285,12 @@
 
 <!-- ── Chargement initial ─────────────────────────────────────────────────── -->
 <div id="initialLoading" class="flex-1 flex items-center justify-center py-20">
-    <div class="text-center">
-        <div class="inline-block w-10 h-10 border-4 border-miel border-t-transparent rounded-full animate-spin"></div>
-    </div>
+    <div class="inline-block w-10 h-10 border-4 border-miel border-t-transparent rounded-full animate-spin"></div>
 </div>
 
-<!-- ── Modal de confirmation de suppression ──────────────────────────────── -->
+<!-- ── Modal suppression ─────────────────────────────────────────────────── -->
 <div id="deleteModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center">
+    <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-sm w-full text-center">
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -241,12 +299,8 @@
         <h3 class="font-titre text-xl font-bold mb-2">Supprimer l'annonce ?</h3>
         <p class="text-raw text-sm mb-6">Cette action est irréversible. L'annonce ne sera plus visible.</p>
         <div class="flex gap-3">
-            <button onclick="closeDeleteModal()" class="flex-1 border border-gray-300 py-2.5 rounded-xl text-gray-600 hover:bg-fond-clair transition-colors text-sm">
-                Annuler
-            </button>
-            <button id="confirmDeleteBtn" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl hover:bg-red-700 transition-colors text-sm">
-                Supprimer
-            </button>
+            <button onclick="closeDeleteModal()" class="flex-1 border border-gray-300 py-2.5 rounded-xl text-gray-600 hover:bg-fond-clair transition-colors text-sm">Annuler</button>
+            <button id="confirmDeleteBtn" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl hover:bg-red-700 transition-colors text-sm">Supprimer</button>
         </div>
     </div>
 </div>
@@ -261,7 +315,7 @@
 
 <script>
     const API_BASE = '/.netlify/functions';
-    let authToken  = localStorage.getItem('authToken');
+    let authToken   = localStorage.getItem('authToken');
     let currentUser = null;
     let pendingDeleteId = null;
 
@@ -270,10 +324,60 @@
         if (!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-
     function formatDate(iso) {
         if (!iso) return '';
         return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ── Validation mot de passe ──────────────────────────────────────────
+    function checkPassword(pw) {
+        return {
+            length:  pw.length >= 8,
+            upper:   /[A-Z]/.test(pw),
+            digit:   /[0-9]/.test(pw),
+            special: (pw.match(/[^a-zA-Z0-9]/g) || []).length >= 2
+        };
+    }
+    function isStrongPassword(pw) {
+        const c = checkPassword(pw);
+        return c.length && c.upper && c.digit && c.special;
+    }
+
+    // ── Indicateur de force (inscription) ───────────────────────────────
+    const CHECK_SVG = `<svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+    const CROSS_SVG = `<svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>`;
+
+    function updateStrength(pw) {
+        const ind = document.getElementById('strengthIndicator');
+        if (!ind) return;
+        if (pw.length === 0) { ind.classList.add('hidden'); return; }
+        ind.classList.remove('hidden');
+
+        const c = checkPassword(pw);
+        const items = {
+            'sc-length':  { ok: c.length,  label: '8 caractères min.' },
+            'sc-upper':   { ok: c.upper,   label: '1 majuscule' },
+            'sc-digit':   { ok: c.digit,   label: '1 chiffre' },
+            'sc-special': { ok: c.special, label: '2 caractères spéciaux' }
+        };
+        for (const [id, { ok, label }] of Object.entries(items)) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            el.className = `strength-item ${ok ? 'ok' : 'fail'}`;
+            el.innerHTML = `${ok ? CHECK_SVG : CROSS_SVG} ${label}`;
+        }
+    }
+
+    // ── Toggle afficher/masquer mot de passe ────────────────────────────
+    function togglePw(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const eyeOpen   = btn.querySelector('.eye-open');
+        const eyeClosed = btn.querySelector('.eye-closed');
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        eyeOpen.classList.toggle('hidden', show);
+        eyeClosed.classList.toggle('hidden', !show);
+        btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
     }
 
     // ── Navigation ────────────────────────────────────────────────────────
@@ -281,26 +385,25 @@
         const navAuth = document.getElementById('navAuth');
         if (isConnected) {
             navAuth.innerHTML = `
-                <span class="text-sm text-gray-600">${escHtml(currentUser?.email || '')}</span>
-                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Déconnexion</button>
+                <span class="text-sm text-gray-600 truncate max-w-[140px]">${escHtml(currentUser?.email || '')}</span>
+                <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700 whitespace-nowrap">Déconnexion</button>
             `;
         } else {
             navAuth.innerHTML = `<a href="mon-compte.html#connexion" class="text-sm text-miel font-bold">Connexion</a>`;
         }
     }
 
-    // ── Onglets auth ─────────────────────────────────────────────────────
+    // ── Onglets ───────────────────────────────────────────────────────────
     function switchTab(tab) {
         const isLogin = tab === 'connexion';
         document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
         document.getElementById('registerPanel').classList.toggle('hidden', isLogin);
         document.getElementById('tabConnexion').classList.toggle('active', isLogin);
         document.getElementById('tabInscription').classList.toggle('active', !isLogin);
-        // Mettre à jour le hash
         history.replaceState(null, '', `#${tab}`);
     }
 
-    // ── Auth ─────────────────────────────────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────────────────
     async function checkAuth() {
         if (!authToken) return false;
         try {
@@ -324,17 +427,14 @@
         showAuthView();
     }
 
-    // ── Vues ─────────────────────────────────────────────────────────────
+    // ── Vues ──────────────────────────────────────────────────────────────
     function showAuthView() {
         document.getElementById('initialLoading').classList.add('hidden');
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
         updateNav(false);
-
-        // Lire le hash pour sélectionner le bon onglet
         const hash = window.location.hash.replace('#', '');
-        if (hash === 'inscription') switchTab('inscription');
-        else switchTab('connexion');
+        switchTab(hash === 'inscription' ? 'inscription' : 'connexion');
     }
 
     function showDashboard() {
@@ -342,14 +442,11 @@
         document.getElementById('authView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
         updateNav(true);
-
-        document.getElementById('userGreeting').textContent =
-            `Connecté en tant que ${currentUser?.email || ''}`;
-
+        document.getElementById('userGreeting').textContent = `Connecté en tant que ${currentUser?.email || ''}`;
         loadMyAnnonces();
     }
 
-    // ── Mes annonces ─────────────────────────────────────────────────────
+    // ── Mes annonces ──────────────────────────────────────────────────────
     async function loadMyAnnonces() {
         document.getElementById('annonceLoading').classList.remove('hidden');
         document.getElementById('annoncesList').classList.add('hidden');
@@ -359,142 +456,122 @@
             const res = await fetch(`${API_BASE}/annonces?action=mine`, {
                 headers: { Authorization: `Bearer ${authToken}` }
             });
-            if (!res.ok) throw new Error('Erreur');
+            if (!res.ok) throw new Error();
             const annonces = await res.json();
 
             document.getElementById('annonceLoading').classList.add('hidden');
-
-            // Stats
-            const total      = annonces.length;
-            const publiees   = annonces.filter(a => a.statut === 'publiee').length;
-            const brouillons = annonces.filter(a => a.statut === 'brouillon').length;
-            document.getElementById('statTotal').textContent      = total;
-            document.getElementById('statPubees').textContent     = publiees;
-            document.getElementById('statBrouillons').textContent = brouillons;
+            document.getElementById('statTotal').textContent      = annonces.length;
+            document.getElementById('statPubees').textContent     = annonces.filter(a => a.statut === 'publiee').length;
+            document.getElementById('statBrouillons').textContent = annonces.filter(a => a.statut === 'brouillon').length;
 
             if (!annonces.length) {
                 document.getElementById('annoncesEmpty').classList.remove('hidden');
                 return;
             }
-
             renderAnnonces(annonces);
             document.getElementById('annoncesList').classList.remove('hidden');
-
         } catch {
             document.getElementById('annonceLoading').classList.add('hidden');
-            document.getElementById('annoncesList').innerHTML = `
-                <div class="p-8 text-center text-red-500 text-sm">
-                    Impossible de charger vos annonces. Veuillez recharger la page.
-                </div>
-            `;
+            document.getElementById('annoncesList').innerHTML = `<div class="p-8 text-center text-red-500 text-sm">Impossible de charger vos annonces. Veuillez recharger la page.</div>`;
             document.getElementById('annoncesList').classList.remove('hidden');
         }
     }
 
     function renderAnnonces(annonces) {
-        const container = document.getElementById('annoncesList');
-        container.innerHTML = annonces.map(a => {
-            const badgeClass = a.statut === 'publiee' ? 'badge-publiee' : 'badge-brouillon';
-            const badgeLabel = a.statut === 'publiee' ? 'Publiée' : 'En pause';
-            const toggleLabel = a.statut === 'publiee' ? 'Mettre en pause' : 'Publier';
-            const toggleIcon  = a.statut === 'publiee'
+        document.getElementById('annoncesList').innerHTML = annonces.map(a => {
+            const isPubliee   = a.statut === 'publiee';
+            const badgeClass  = isPubliee ? 'badge-publiee' : 'badge-brouillon';
+            const badgeLabel  = isPubliee ? 'Publiée' : 'En pause';
+            const toggleLabel = isPubliee ? 'Pause' : 'Publier';
+            const toggleIcon  = isPubliee
                 ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"/></svg>`
                 : `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
 
             return `
-            <div class="annonce-row p-5 flex flex-col sm:flex-row sm:items-center gap-4" id="row-${a.id}">
-                <!-- Info principale -->
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap mb-1">
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${badgeClass}">${badgeLabel}</span>
-                        <a href="annonce-detail.html?id=${a.id}" class="font-titre font-bold text-seal hover:text-tigers transition-colors truncate">
-                            ${escHtml(a.titre)}
+            <div class="annonce-row p-4 sm:p-5" id="row-${a.id}">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-full ${badgeClass} whitespace-nowrap">${badgeLabel}</span>
+                            <a href="annonce-detail.html?id=${a.id}" class="font-titre font-bold text-seal hover:text-tigers transition-colors line-clamp-1">
+                                ${escHtml(a.titre)}
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-400 flex-wrap">
+                            <span>${escHtml(a.ville)}</span>
+                            <span>${formatDate(a.created_at)}</span>
+                            ${Number(a.photos_count) > 0 ? `<span>📷 ${a.photos_count}</span>` : ''}
+                        </div>
+                    </div>
+                    <!-- Actions -->
+                    <div class="action-btns">
+                        <a href="annonce-detail.html?id=${a.id}" class="text-xs border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg hover:bg-fond-clair transition-colors flex items-center gap-1 whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Voir
                         </a>
+                        <a href="annonce-form.html?id=${a.id}" class="text-xs bg-blue-50 border border-blue-200 text-blue-700 px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1 whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Modifier
+                        </a>
+                        <button onclick="toggleAnnonce(${a.id})" id="toggleBtn-${a.id}"
+                                class="text-xs bg-yellow-50 border border-yellow-200 text-yellow-700 px-2.5 py-1.5 rounded-lg hover:bg-yellow-100 transition-colors flex items-center gap-1 whitespace-nowrap">
+                            ${toggleIcon} ${toggleLabel}
+                        </button>
+                        <button onclick="openDeleteModal(${a.id})"
+                                class="text-xs bg-red-50 border border-red-200 text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Supprimer
+                        </button>
                     </div>
-                    <div class="flex items-center gap-3 text-xs text-gray-400 flex-wrap">
-                        <span class="flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                            ${escHtml(a.ville)}
-                        </span>
-                        <span>Publiée le ${formatDate(a.created_at)}</span>
-                        ${a.photos_count > 0 ? `<span>📷 ${a.photos_count} photo${a.photos_count > 1 ? 's' : ''}</span>` : ''}
-                    </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <a href="annonce-detail.html?id=${a.id}"
-                       class="text-xs border border-gray-200 text-gray-600 px-3 py-2 rounded-lg hover:bg-fond-clair transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        Voir
-                    </a>
-                    <a href="annonce-form.html?id=${a.id}"
-                       class="text-xs bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        Modifier
-                    </a>
-                    <button onclick="toggleAnnonce(${a.id}, '${a.statut}')"
-                            class="text-xs bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-100 transition-colors flex items-center gap-1" id="toggleBtn-${a.id}">
-                        ${toggleIcon}
-                        ${toggleLabel}
-                    </button>
-                    <button onclick="openDeleteModal(${a.id})"
-                            class="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Supprimer
-                    </button>
                 </div>
             </div>`;
         }).join('');
     }
 
-    // ── Toggle statut ────────────────────────────────────────────────────
-    async function toggleAnnonce(id, currentStatut) {
+    // ── Toggle statut ─────────────────────────────────────────────────────
+    async function toggleAnnonce(id) {
         const btn = document.getElementById(`toggleBtn-${id}`);
         if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
-
         try {
             const res = await fetch(`${API_BASE}/annonces`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
                 body: JSON.stringify({ id, action: 'toggle' })
             });
-
-            if (!res.ok) throw new Error('Erreur');
-            await loadMyAnnonces(); // Rafraîchir
+            if (!res.ok) throw new Error();
+            await loadMyAnnonces();
         } catch {
             alert('Impossible de changer le statut. Réessayez.');
             if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
         }
     }
 
-    // ── Suppression ──────────────────────────────────────────────────────
+    // ── Suppression ───────────────────────────────────────────────────────
     function openDeleteModal(id) {
         pendingDeleteId = id;
         document.getElementById('deleteModal').classList.remove('hidden');
     }
-
     function closeDeleteModal() {
         pendingDeleteId = null;
         document.getElementById('deleteModal').classList.add('hidden');
     }
-
+    document.getElementById('deleteModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
+    });
     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
         if (!pendingDeleteId) return;
         const id = pendingDeleteId;
         closeDeleteModal();
-
         const row = document.getElementById(`row-${id}`);
         if (row) { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; }
-
         try {
             const res = await fetch(`${API_BASE}/annonces`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
                 body: JSON.stringify({ id })
             });
-
-            if (!res.ok) throw new Error('Erreur');
+            if (!res.ok) throw new Error();
             await loadMyAnnonces();
         } catch {
             alert('Impossible de supprimer l\'annonce. Réessayez.');
@@ -502,12 +579,7 @@
         }
     });
 
-    // Fermer le modal en cliquant à l'extérieur
-    document.getElementById('deleteModal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
-    });
-
-    // ── Formulaires Auth ─────────────────────────────────────────────────
+    // ── Formulaire connexion ──────────────────────────────────────────────
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email    = document.getElementById('loginEmail').value.trim();
@@ -520,13 +592,12 @@
         btn.textContent = 'Connexion…';
 
         try {
-            const res = await fetch(`${API_BASE}/auth`, {
+            const res  = await fetch(`${API_BASE}/auth`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'login', email, password })
             });
             const data = await res.json();
-
             if (res.ok && data.token) {
                 authToken = data.token;
                 localStorage.setItem('authToken', authToken);
@@ -540,29 +611,29 @@
             errEl.textContent = 'Erreur de connexion. Réessayez.';
             errEl.classList.remove('hidden');
         }
-
         btn.disabled = false;
         btn.textContent = 'Se connecter';
     });
 
+    // ── Formulaire inscription ────────────────────────────────────────────
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const pseudo          = document.getElementById('regPseudo').value.trim();
-        const email           = document.getElementById('regEmail').value.trim();
-        const password        = document.getElementById('regPassword').value;
-        const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-        const errEl           = document.getElementById('registerError');
-        const btn             = document.getElementById('registerBtn');
+        const pseudo   = document.getElementById('regPseudo').value.trim();
+        const email    = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm  = document.getElementById('regPasswordConfirm').value;
+        const errEl    = document.getElementById('registerError');
+        const btn      = document.getElementById('registerBtn');
 
         errEl.classList.add('hidden');
 
-        if (password !== passwordConfirm) {
-            errEl.textContent = 'Les mots de passe ne correspondent pas.';
+        if (!isStrongPassword(password)) {
+            errEl.textContent = 'Le mot de passe ne respecte pas les critères de sécurité (voir indicateur ci-dessus).';
             errEl.classList.remove('hidden');
             return;
         }
-        if (password.length < 8) {
-            errEl.textContent = 'Le mot de passe doit comporter au moins 8 caractères.';
+        if (password !== confirm) {
+            errEl.textContent = 'Les mots de passe ne correspondent pas.';
             errEl.classList.remove('hidden');
             return;
         }
@@ -571,13 +642,12 @@
         btn.textContent = 'Création du compte…';
 
         try {
-            const res = await fetch(`${API_BASE}/auth`, {
+            const res  = await fetch(`${API_BASE}/auth`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'register', email, password, pseudo: pseudo || undefined })
             });
             const data = await res.json();
-
             if (res.ok && data.token) {
                 authToken = data.token;
                 localStorage.setItem('authToken', authToken);
@@ -591,30 +661,23 @@
             errEl.textContent = 'Erreur de connexion. Réessayez.';
             errEl.classList.remove('hidden');
         }
-
         btn.disabled = false;
         btn.textContent = 'Créer mon compte';
     });
 
-    // ── Événements ────────────────────────────────────────────────────────
+    // ── Événements nav mobile ─────────────────────────────────────────────
     document.getElementById('mobile-menu-button').addEventListener('click', () => {
         document.getElementById('mobile-menu').classList.toggle('hidden');
     });
-
-    // Gestion du hash pour navigation directe
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash.replace('#', '');
         if (['connexion','inscription'].includes(hash)) switchTab(hash);
     });
 
-    // ── Init ─────────────────────────────────────────────────────────────
+    // ── Init ──────────────────────────────────────────────────────────────
     (async () => {
-        const isConnected = await checkAuth();
-        if (isConnected) {
-            showDashboard();
-        } else {
-            showAuthView();
-        }
+        const ok = await checkAuth();
+        ok ? showDashboard() : showAuthView();
     })();
 </script>
 </body>

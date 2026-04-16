@@ -32,9 +32,18 @@ function isValidEmail(email) {
   return emailRegex.test(email) && email.length <= 254;
 }
 
-// Validation de mot de passe (longueur et caractères)
+// Validation de mot de passe (longueur uniquement — utilisé pour la connexion)
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 1 && password.length <= 128;
+}
+
+// Validation renforcée pour l'inscription : 8 car. min, 1 majuscule, 1 chiffre, 2 spéciaux
+function isStrongPassword(password) {
+  if (typeof password !== 'string' || password.length < 8 || password.length > 128) return false;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasDigit     = /[0-9]/.test(password);
+  const specialCount = (password.match(/[^a-zA-Z0-9]/g) || []).length;
+  return hasUppercase && hasDigit && specialCount >= 2;
 }
 
 // Validation de token JWT
@@ -238,11 +247,11 @@ exports.handler = async (event, context) => {
           };
         }
 
-        if (password.length < 8) {
+        if (!isStrongPassword(password)) {
           return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ error: 'Le mot de passe doit contenir au moins 8 caractères' })
+            body: JSON.stringify({ error: 'Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 chiffre et 2 caractères spéciaux' })
           };
         }
 
