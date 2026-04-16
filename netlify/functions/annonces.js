@@ -31,7 +31,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL,
+  connectionString: process.env.NEON_DATABASE_URL || 'postgresql://neondb_owner:npg_n51StIYyoKkV@ep-lingering-snowflake-ae815a6g-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require',
   ssl: { rejectUnauthorized: false }
 });
 
@@ -285,14 +285,14 @@ exports.handler = async (event) => {
         const result = await pool.query(
           `INSERT INTO annonces
              (titre, description, ville, email_contact, telephone_contact, statut, user_email, photos)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
            RETURNING id, titre, ville, statut, created_at`,
           [
             sanitize(titre, 200),
             sanitize(description, 5000),
             sanitize(ville, 100),
-            emailContact    ? sanitize(emailContact, 254)    : null,
-            telephoneContact ? sanitize(telephoneContact, 20) : null,
+            emailContact     ? sanitize(emailContact, 254)     : null,
+            telephoneContact ? sanitize(telephoneContact, 20)  : null,
             finalStatut,
             authUser.email,
             JSON.stringify(photos)
@@ -363,14 +363,14 @@ exports.handler = async (event) => {
           `UPDATE annonces
            SET titre = $1, description = $2, ville = $3,
                email_contact = $4, telephone_contact = $5,
-               statut = $6, photos = $7, updated_at = NOW()
+               statut = $6, photos = $7::jsonb, updated_at = NOW()
            WHERE id = $8
            RETURNING id, titre, ville, statut, updated_at`,
           [
             sanitize(titre, 200),
             sanitize(description, 5000),
             sanitize(ville, 100),
-            emailContact    ? sanitize(emailContact, 254)    : null,
+            emailContact     ? sanitize(emailContact, 254)    : null,
             telephoneContact ? sanitize(telephoneContact, 20) : null,
             finalStatut,
             JSON.stringify(photos),
@@ -422,7 +422,11 @@ exports.handler = async (event) => {
     }
 
   } catch (error) {
-    console.error(`[ANNONCES_ERROR] ${new Date().toISOString()} - ${error.message}`);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erreur serveur interne' }) };
+    console.error(`[ANNONCES_ERROR] ${new Date().toISOString()} - ${error.message} - ${error.stack}`);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Erreur serveur interne', detail: error.message })
+    };
   }
 };
