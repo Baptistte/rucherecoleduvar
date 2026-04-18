@@ -602,6 +602,8 @@
                 authToken = data.token;
                 localStorage.setItem('authToken', authToken);
                 currentUser = { email: data.email };
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+                if (redirectUrl) { window.location.href = redirectUrl; return; }
                 showDashboard();
             } else {
                 errEl.textContent = data.error || 'Email ou mot de passe incorrect.';
@@ -652,6 +654,8 @@
                 authToken = data.token;
                 localStorage.setItem('authToken', authToken);
                 currentUser = { email: data.email };
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+                if (redirectUrl) { window.location.href = redirectUrl; return; }
                 showDashboard();
             } else {
                 errEl.textContent = data.error || 'Impossible de créer le compte.';

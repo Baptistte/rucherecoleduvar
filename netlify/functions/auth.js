@@ -173,7 +173,7 @@ exports.handler = async (event, context) => {
                 ip: clientIP 
               },
               JWT_SECRET,
-              { expiresIn: '8h' } // Réduit de 24h à 8h pour plus de sécurité
+              { expiresIn: '30d' }
             );
             
             logSecurityEvent('LOGIN_SUCCESS', clientIP, email);
@@ -209,16 +209,6 @@ exports.handler = async (event, context) => {
 
         try {
           const decoded = jwt.verify(token, JWT_SECRET);
-          
-          // Vérification supplémentaire de l'IP (optionnel mais recommandé)
-          if (decoded.ip && decoded.ip !== clientIP) {
-            logSecurityEvent('IP_MISMATCH', clientIP, `Expected: ${decoded.ip}`);
-            return {
-              statusCode: 401,
-              headers,
-              body: JSON.stringify({ valid: false, error: 'Token invalid' })
-            };
-          }
           
           return {
             statusCode: 200,
@@ -305,7 +295,7 @@ exports.handler = async (event, context) => {
             ip: clientIP
           },
           JWT_SECRET,
-          { expiresIn: '8h' }
+          { expiresIn: '30d' }
         );
 
         logSecurityEvent('REGISTER_SUCCESS', clientIP, email);

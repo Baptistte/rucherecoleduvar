@@ -189,10 +189,10 @@
                             <svg class="w-6 h-6 text-tigers" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                         </div>
                         <p class="text-gray-600 text-sm mb-4">Connectez-vous pour voir les coordonnées de l'annonceur.</p>
-                        <a href="mon-compte.html#connexion" class="block w-full bg-miel text-black font-bold py-2.5 px-4 rounded-xl hover:bg-yellow-500 transition-colors text-sm text-center">
+                        <a id="loginLink" href="mon-compte.html#connexion" class="block w-full bg-miel text-black font-bold py-2.5 px-4 rounded-xl hover:bg-yellow-500 transition-colors text-sm text-center">
                             Se connecter
                         </a>
-                        <a href="mon-compte.html#inscription" class="block w-full mt-2 border border-gray-300 text-gray-600 py-2.5 px-4 rounded-xl hover:bg-fond-clair transition-colors text-sm text-center">
+                        <a id="registerLink" href="mon-compte.html#inscription" class="block w-full mt-2 border border-gray-300 text-gray-600 py-2.5 px-4 rounded-xl hover:bg-fond-clair transition-colors text-sm text-center">
                             Créer un compte
                         </a>
                     </div>
@@ -447,6 +447,11 @@
     });
 
     // ── Init ─────────────────────────────────────────────────────────────
+    // Mettre à jour les liens de connexion avec l'URL de retour
+    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    document.getElementById('loginLink').href = `mon-compte.html?redirect=${returnUrl}#connexion`;
+    document.getElementById('registerLink').href = `mon-compte.html?redirect=${returnUrl}#inscription`;
+
     loadAnnonce();
 </script>
 </body>
