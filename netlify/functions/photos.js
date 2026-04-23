@@ -32,68 +32,87 @@ const getImageDataUrl = (photo) => {
 // Validation des types MIME autorisés pour les images
 const ALLOWED_MIME_TYPES = [
   'image/jpeg',
-  'image/jpg', 
+  'image/jpg',
   'image/png',
   'image/gif',
   'image/webp'
 ];
 
+const VALID_MEDIA_TYPES = ['image', 'video'];
+
 // Taille maximale des fichiers (5 MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-// Validation des données de photo
+// Validation des données de photo/vidéo
 const validatePhotoData = (data) => {
-  const { title, description, url, imageData, fileName, fileSize, mimeType, category } = data;
-  
+  const { title, description, url, imageData, fileName, fileSize, mimeType, category, mediaType } = data;
+
   // Validation du titre
   if (!title || typeof title !== 'string' || title.length < 1 || title.length > 200) {
     return { valid: false, error: 'Invalid title format' };
   }
-  
+
   // Validation de la description (optionnelle)
   if (description && (typeof description !== 'string' || description.length > 1000)) {
     return { valid: false, error: 'Invalid description format' };
   }
-  
+
   // Validation de la catégorie
   const validCategories = ['apiculture', 'formation', 'evenements', 'rucher'];
   if (!category || !validCategories.includes(category)) {
     return { valid: false, error: 'Invalid category' };
   }
-  
-  // Validation : soit URL soit imageData requis
+
+  // Validation du type de média (optionnel, défaut 'image')
+  const resolvedMediaType = mediaType || 'image';
+  if (!VALID_MEDIA_TYPES.includes(resolvedMediaType)) {
+    return { valid: false, error: 'Invalid media type' };
+  }
+
+  // Les vidéos n'acceptent que les URL (trop lourdes pour base64 via Netlify Functions)
+  if (resolvedMediaType === 'video') {
+    if (!url || typeof url !== 'string' || url.length < 1 || url.length > 1000) {
+      return { valid: false, error: 'Une URL est requise pour les vidéos' };
+    }
+    if (imageData) {
+      return { valid: false, error: 'L\'upload de fichier vidéo n\'est pas supporté, utilisez une URL' };
+    }
+    return { valid: true };
+  }
+
+  // Validation : soit URL soit imageData requis (images)
   if (!url && !imageData) {
     return { valid: false, error: 'URL ou données d\'image requises' };
   }
-  
+
   // Validation de l'URL si fournie
   if (url && (typeof url !== 'string' || url.length > 500)) {
     return { valid: false, error: 'Invalid URL format' };
   }
-  
+
   // Validation des données d'image si fournies
   if (imageData) {
     // Validation Base64
     if (typeof imageData !== 'string' || !isValidBase64(imageData)) {
       return { valid: false, error: 'Invalid image data format' };
     }
-    
+
     // Validation du type MIME
     if (!mimeType || !ALLOWED_MIME_TYPES.includes(mimeType)) {
       return { valid: false, error: 'Invalid or unsupported image type' };
     }
-    
+
     // Validation de la taille de fichier
     if (fileSize && (typeof fileSize !== 'number' || fileSize > MAX_FILE_SIZE || fileSize < 1)) {
       return { valid: false, error: 'File size too large or invalid' };
     }
-    
+
     // Validation du nom de fichier
     if (fileName && (typeof fileName !== 'string' || fileName.length > 255)) {
       return { valid: false, error: 'Invalid file name' };
     }
   }
-  
+
   return { valid: true };
 };
 
@@ -219,22 +238,23 @@ exports.handler = async (event, context) => {
           };
         }
 
-        const { 
-          title, 
-          description, 
-          url, 
-          imageData, 
-          fileName, 
-          fileSize, 
-          mimeType, 
-          category 
+        const {
+          title,
+          description,
+          url,
+          imageData,
+          fileName,
+          fileSize,
+          mimeType,
+          category,
+          mediaType
         } = parsedBody;
 
         try {
           const insertResult = await pool.query(
-            `INSERT INTO photos (title, description, url, image_data, file_name, file_size, mime_type, category) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-            [title, description || '', url || null, imageData || null, fileName || null, fileSize || null, mimeType || null, category]
+            `INSERT INTO photos (title, description, url, image_data, file_name, file_size, mime_type, category, media_type)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+            [title, description || '', url || null, imageData || null, fileName || null, fileSize || null, mimeType || null, category, mediaType || 'image']
           );
 
           const newPhoto = {
@@ -299,34 +319,36 @@ exports.handler = async (event, context) => {
           };
         }
 
-        const { 
-          id, 
-          title: newTitle, 
-          description: newDescription, 
-          url: newUrl, 
+        const {
+          id,
+          title: newTitle,
+          description: newDescription,
+          url: newUrl,
           imageData: newImageData,
           fileName: newFileName,
           fileSize: newFileSize,
           mimeType: newMimeType,
-          category: newCategory 
+          category: newCategory,
+          mediaType: newMediaType
         } = parsedBody;
 
         try {
           const updateResult = await pool.query(
-            `UPDATE photos SET 
-             title = $1, description = $2, url = $3, image_data = $4, 
-             file_name = $5, file_size = $6, mime_type = $7, category = $8, 
-             updated_at = CURRENT_TIMESTAMP 
-             WHERE id = $9 RETURNING *`,
+            `UPDATE photos SET
+             title = $1, description = $2, url = $3, image_data = $4,
+             file_name = $5, file_size = $6, mime_type = $7, category = $8,
+             media_type = $9, updated_at = CURRENT_TIMESTAMP
+             WHERE id = $10 RETURNING *`,
             [
-              newTitle, 
-              newDescription || '', 
-              newUrl || null, 
+              newTitle,
+              newDescription || '',
+              newUrl || null,
               newImageData || null,
               newFileName || null,
               newFileSize || null,
               newMimeType || null,
-              newCategory, 
+              newCategory,
+              newMediaType || 'image',
               id
             ]
           );

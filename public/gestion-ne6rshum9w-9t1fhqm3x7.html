@@ -233,18 +233,33 @@
         </div>
     </div>
 
-    <!-- Modal pour ajouter/modifier une photo -->
+    <!-- Modal pour ajouter/modifier une photo ou une vidéo -->
     <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 class="font-titre text-xl font-bold mb-4">Photo</h3>
+            <h3 class="font-titre text-xl font-bold mb-4" id="photoModalTitle">Photo / Vidéo</h3>
             <form id="photoForm">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Titre</label>
                     <input type="text" id="photoTitle" required class="w-full px-3 py-2 border rounded-lg">
                 </div>
-                
-                <!-- Section upload ou URL -->
-                <div class="mb-4">
+
+                <!-- Type de média -->
+                <div class="mb-4" id="mediaTypeSection">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Type de média</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="mediaType" value="image" checked class="mr-2">
+                            <span>Photo</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="mediaType" value="video" class="mr-2">
+                            <span>Vidéo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section upload ou URL (images) -->
+                <div id="imageInputSection" class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Méthode d'ajout</label>
                     <div class="flex space-x-4 mb-3">
                         <label class="flex items-center">
@@ -256,25 +271,30 @@
                             <span>URL d'image</span>
                         </label>
                     </div>
-                </div>
 
-                <!-- Upload de fichier -->
-                <div id="fileUploadSection" class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Sélectionner un fichier image</label>
-                    <input type="file" id="photoFile" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
-                    <p class="text-xs text-gray-500 mt-1">Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)</p>
-                    
-                    <!-- Aperçu de l'image -->
-                    <div id="imagePreview" class="mt-3 hidden">
-                        <img id="previewImg" src="" alt="Aperçu" class="max-w-full h-32 object-cover rounded border">
-                        <p id="fileInfo" class="text-xs text-gray-600 mt-1"></p>
+                    <!-- Upload de fichier -->
+                    <div id="fileUploadSection" class="mb-2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Sélectionner un fichier image</label>
+                        <input type="file" id="photoFile" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
+                        <p class="text-xs text-gray-500 mt-1">Formats acceptés : JPG, PNG, GIF, WebP (max 5 MB)</p>
+                        <div id="imagePreview" class="mt-3 hidden">
+                            <img id="previewImg" src="" alt="Aperçu" class="max-w-full h-32 object-cover rounded border">
+                            <p id="fileInfo" class="text-xs text-gray-600 mt-1"></p>
+                        </div>
+                    </div>
+
+                    <!-- URL d'image -->
+                    <div id="urlSection" class="mb-2 hidden">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">URL de l'image</label>
+                        <input type="url" id="photoUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://…">
                     </div>
                 </div>
 
-                <!-- URL d'image -->
-                <div id="urlSection" class="mb-4 hidden">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">URL de l'image</label>
-                    <input type="url" id="photoUrl" class="w-full px-3 py-2 border rounded-lg">
+                <!-- URL vidéo -->
+                <div id="videoUrlSection" class="mb-4 hidden">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">URL de la vidéo</label>
+                    <input type="url" id="videoUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…">
+                    <p class="text-xs text-gray-500 mt-1">YouTube, Vimeo ou lien direct (mp4…)</p>
                 </div>
 
                 <div class="mb-4">
@@ -581,37 +601,46 @@
             }
         };
 
-        // Créer un élément photo
+        // Créer un élément photo/vidéo
         const createPhotoElement = (photo) => {
             const div = document.createElement('div');
             div.className = 'bg-white p-4 rounded-lg shadow border flex items-center space-x-4';
-            
-            // Créer l'URL d'affichage de l'image
-            let imageUrl = '';
-            if (photo.displayUrl) {
-                imageUrl = photo.displayUrl;
-            } else if (photo.url) {
-                imageUrl = photo.url;
-            } else if (photo.image_data && photo.mime_type) {
-                imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+
+            const isVideo = photo.media_type === 'video';
+
+            let thumbHtml;
+            if (isVideo) {
+                // Vignette YouTube si disponible, sinon icône générique
+                const ytMatch = photo.url && photo.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                if (ytMatch) {
+                    thumbHtml = `<img src="https://img.youtube.com/vi/${ytMatch[1]}/mqdefault.jpg" class="w-16 h-16 object-cover rounded border" onerror="this.style.display='none'">`;
+                } else {
+                    thumbHtml = `<div class="w-16 h-16 bg-gray-800 rounded border flex items-center justify-center text-white text-xs">▶ Vidéo</div>`;
+                }
+            } else {
+                let imageUrl = '';
+                if (photo.displayUrl) imageUrl = photo.displayUrl;
+                else if (photo.url) imageUrl = photo.url;
+                else if (photo.image_data && photo.mime_type) imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+                thumbHtml = imageUrl
+                    ? `<img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded border" onerror="this.style.display='none'">`
+                    : `<div class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center text-gray-500 text-xs">Pas d'image</div>`;
             }
-            
+
             div.innerHTML = `
-                <div class="flex-shrink-0">
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded border" onerror="this.style.display='none'">` : '<div class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center text-gray-500 text-xs">Pas d\'image</div>'}
-                </div>
+                <div class="flex-shrink-0">${thumbHtml}</div>
                 <div class="flex-grow">
                     <div class="font-bold">${photo.title}</div>
                     <div class="text-gray-600 text-sm">${photo.description || 'Aucune description'}</div>
-                    <div class="text-xs text-gray-500">Catégorie: ${photo.category}</div>
-                    ${photo.file_name ? `<div class="text-xs text-gray-400">Fichier: ${photo.file_name}</div>` : ''}
+                    <div class="text-xs text-gray-500">Catégorie : ${photo.category} · ${isVideo ? 'Vidéo' : 'Photo'}</div>
+                    ${photo.file_name ? `<div class="text-xs text-gray-400">Fichier : ${photo.file_name}</div>` : ''}
                 </div>
                 <div class="flex space-x-2">
-                    <button class="edit-photo-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border rounded hover:bg-blue-50" 
+                    <button class="edit-photo-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border rounded hover:bg-blue-50"
                             data-id="${photo.id}">
                         Modifier
                     </button>
-                    <button class="delete-photo-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 border rounded hover:bg-red-50" 
+                    <button class="delete-photo-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 border rounded hover:bg-red-50"
                             data-id="${photo.id}">
                         Supprimer
                     </button>
@@ -745,35 +774,38 @@
             }
         });
 
-        // Sauvegarder une photo
+        // Sauvegarder une photo ou une vidéo
         document.getElementById('photoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            const mediaType = document.querySelector('input[name="mediaType"]:checked')?.value || 'image';
+
             const photoData = {
                 title: document.getElementById('photoTitle').value,
                 description: document.getElementById('photoDescription').value,
-                category: document.getElementById('photoCategory').value
+                category: document.getElementById('photoCategory').value,
+                mediaType
             };
 
-            // En mode édition, on ne modifie que les métadonnées mais on inclut les données d'image existantes
+            // En mode édition, on ne modifie que les métadonnées mais on inclut les données existantes
             if (editingPhotoId) {
                 try {
                     const updateData = {
                         ...photoData,
                         id: editingPhotoId,
-                        // Inclure les données d'image existantes
                         url: window.currentPhotoData.url,
                         imageData: window.currentPhotoData.imageData,
                         fileName: window.currentPhotoData.fileName,
                         fileSize: window.currentPhotoData.fileSize,
-                        mimeType: window.currentPhotoData.mimeType
+                        mimeType: window.currentPhotoData.mimeType,
+                        mediaType: window.currentPhotoData.mediaType || 'image'
                     };
-                    
+
                     await apiCall('/photos', {
                         method: 'PUT',
                         body: JSON.stringify(updateData)
                     });
-                    
+
                     editingPhotoId = null;
                     window.currentPhotoData = null;
                     photoModal.classList.add('hidden');
@@ -785,20 +817,42 @@
                 return;
             }
 
-            // Mode création - gérer l'upload d'image
+            // Mode création — vidéo (URL uniquement)
+            if (mediaType === 'video') {
+                const videoUrl = document.getElementById('videoUrl').value.trim();
+                if (!videoUrl) {
+                    alert('Veuillez entrer une URL pour la vidéo.');
+                    return;
+                }
+                try {
+                    await apiCall('/photos', {
+                        method: 'POST',
+                        body: JSON.stringify({ ...photoData, url: videoUrl })
+                    });
+                    editingPhotoId = null;
+                    window.currentPhotoData = null;
+                    photoModal.classList.add('hidden');
+                    photoModal.classList.remove('flex');
+                    loadPhotos();
+                } catch (error) {
+                    alert('Erreur lors de la sauvegarde: ' + error.message);
+                }
+                return;
+            }
+
+            // Mode création — image
             const uploadMethod = document.querySelector('input[name="uploadMethod"]:checked').value;
             const file = document.getElementById('photoFile').files[0];
-            
+
             photoData.url = uploadMethod === 'url' ? document.getElementById('photoUrl').value : null;
 
             if (uploadMethod === 'file' && file) {
-                // Upload de fichier - convertir en Base64
                 const reader = new FileReader();
-                
+
                 reader.onload = async (event) => {
                     const dataUrl = event.target.result;
-                    const base64Data = dataUrl.split(',')[1]; // Enlever le préfixe data:mime;base64,
-                    
+                    const base64Data = dataUrl.split(',')[1];
+
                     const fileData = {
                         ...photoData,
                         imageData: base64Data,
@@ -812,7 +866,7 @@
                             method: 'POST',
                             body: JSON.stringify(fileData)
                         });
-                        
+
                         editingPhotoId = null;
                         window.currentPhotoData = null;
                         photoModal.classList.add('hidden');
@@ -822,10 +876,9 @@
                         alert('Erreur lors de la sauvegarde: ' + error.message);
                     }
                 };
-                
+
                 reader.readAsDataURL(file);
             } else if (uploadMethod === 'url' && document.getElementById('photoUrl').value) {
-                // Upload par URL
                 const urlData = {
                     ...photoData,
                     url: document.getElementById('photoUrl').value
@@ -836,7 +889,7 @@
                         method: 'POST',
                         body: JSON.stringify(urlData)
                     });
-                    
+
                     editingPhotoId = null;
                     window.currentPhotoData = null;
                     photoModal.classList.add('hidden');
@@ -853,24 +906,49 @@
         // ===================================
         // GESTION DE LA PRÉVISUALISATION D'IMAGES
         // ===================================
-        
+
+        // Basculer l'affichage selon le type de média
+        const applyMediaTypeUI = (mediaType) => {
+            const imageInputSection = document.getElementById('imageInputSection');
+            const videoUrlSection = document.getElementById('videoUrlSection');
+
+            if (mediaType === 'video') {
+                imageInputSection.classList.add('hidden');
+                videoUrlSection.classList.remove('hidden');
+            } else {
+                imageInputSection.classList.remove('hidden');
+                videoUrlSection.classList.add('hidden');
+            }
+        };
+
+        // Écouter les changements de type de média
+        document.querySelectorAll('input[name="mediaType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                applyMediaTypeUI(e.target.value);
+            });
+        });
+
         // Réinitialiser la prévisualisation
         const resetPhotoPreview = () => {
             const preview = document.getElementById('imagePreview');
             const fileInput = document.getElementById('photoFile');
-            const urlInput = document.getElementById('photoUrl');
-            
+
             preview.classList.add('hidden');
             fileInput.disabled = false;
-            
-            // Réinitialiser les sections upload
+
+            // Remettre le titre de la modal
+            document.getElementById('photoModalTitle').textContent = 'Photo / Vidéo';
+
+            // Réinitialiser le type de média sur "image"
+            document.querySelector('input[name="mediaType"][value="image"]').checked = true;
+            document.getElementById('mediaTypeSection').style.display = 'block';
+            applyMediaTypeUI('image');
+            document.getElementById('videoUrl').value = '';
+
+            // Réinitialiser les sections upload image
             document.querySelector('input[name="uploadMethod"][value="file"]').checked = true;
             document.getElementById('fileUploadSection').classList.remove('hidden');
             document.getElementById('urlSection').classList.add('hidden');
-            
-            // Réafficher la section "Méthode d'ajout" en cas d'édition précédente
-            const uploadMethodSection = document.querySelector('input[name="uploadMethod"]').closest('.mb-4');
-            uploadMethodSection.style.display = 'block';
         };
 
         // Prévisualisation d'image à partir d'un fichier
@@ -1020,53 +1098,52 @@
         window.editPhoto = async (id) => {
             const photos = await apiCall('/photos');
             const photo = photos.find(p => p.id === id);
-            
+
             editingPhotoId = id;
-            
-            // Stocker les données de la photo existante pour les inclure dans la modification
+
             window.currentPhotoData = {
                 url: photo.url,
                 imageData: photo.image_data,
                 fileName: photo.file_name,
                 fileSize: photo.file_size,
-                mimeType: photo.mime_type
+                mimeType: photo.mime_type,
+                mediaType: photo.media_type || 'image'
             };
-            
+
             document.getElementById('photoTitle').value = photo.title;
             document.getElementById('photoDescription').value = photo.description || '';
             document.getElementById('photoCategory').value = photo.category;
-            
-            // En mode édition, on cache toutes les sections d'upload/URL
-            // L'utilisateur ne peut modifier que les métadonnées (titre, description, catégorie)
-            document.getElementById('fileUploadSection').classList.add('hidden');
-            document.getElementById('urlSection').classList.add('hidden');
-            
-            // Cacher la section "Méthode d'ajout"
-            const uploadMethodSection = document.querySelector('input[name="uploadMethod"]').closest('.mb-4');
-            uploadMethodSection.style.display = 'none';
-            
-            // Afficher un aperçu de l'image existante si disponible
+
+            // En mode édition, on cache les sections d'ajout de contenu
+            document.getElementById('mediaTypeSection').style.display = 'none';
+            document.getElementById('imageInputSection').classList.add('hidden');
+            document.getElementById('videoUrlSection').classList.add('hidden');
+
+            // Aperçu selon le type
             const preview = document.getElementById('imagePreview');
             const previewImg = document.getElementById('previewImg');
             const fileInfo = document.getElementById('fileInfo');
-            
-            let imageUrl = '';
-            if (photo.displayUrl) {
-                imageUrl = photo.displayUrl;
-            } else if (photo.url) {
-                imageUrl = photo.url;
-            } else if (photo.image_data && photo.mime_type) {
-                imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
-            }
-            
-            if (imageUrl) {
-                previewImg.src = imageUrl;
-                fileInfo.textContent = `Image actuelle: ${photo.file_name || 'Photo existante'}`;
-                preview.classList.remove('hidden');
-            } else {
+
+            const isVideo = (photo.media_type || 'image') === 'video';
+
+            if (isVideo) {
                 preview.classList.add('hidden');
+                document.getElementById('photoModalTitle').textContent = 'Modifier la vidéo';
+            } else {
+                let imageUrl = '';
+                if (photo.image_data && photo.mime_type) imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+                else if (photo.url) imageUrl = photo.url;
+
+                if (imageUrl) {
+                    previewImg.src = imageUrl;
+                    fileInfo.textContent = `Média actuel : ${photo.file_name || 'Photo existante'}`;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+                document.getElementById('photoModalTitle').textContent = 'Modifier la photo';
             }
-            
+
             photoModal.classList.remove('hidden');
             photoModal.classList.add('flex');
         };

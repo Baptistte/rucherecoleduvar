@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galerie Photo - Rucher-École du Var</title>
-    <meta name="description" content="Explorez la galerie photo du Rucher-École du Var. Découvrez la vie du rucher, nos formations en apiculture et nos événements à travers nos images.">
+    <title>Galerie Photo & Vidéo - Rucher-École du Var</title>
+    <meta name="description" content="Explorez la galerie photo et vidéo du Rucher-École du Var. Découvrez la vie du rucher, nos formations en apiculture et nos événements à travers nos médias.">
     <link rel="canonical" href="https://rucherecoleduvar.com/galerie.html" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,15 +76,55 @@
         .photo-item {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .photo-item:hover {
             transform: scale(1.05);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
+        /* Overlay play pour les vidéos */
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.35);
+            transition: background 0.2s;
+        }
+        .photo-item:hover .video-overlay {
+            background: rgba(0,0,0,0.55);
+        }
+        .play-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(246,160,31,0.92);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Modal styles */
         .modal-backdrop {
             backdrop-filter: blur(5px);
+        }
+
+        /* Responsive iframe vidéo */
+        .video-embed-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            background: #000;
+        }
+        .video-embed-wrapper iframe,
+        .video-embed-wrapper video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -129,8 +169,8 @@
 
     <!-- En-tête de page -->
     <header class="text-center py-6 bg-gamboge text-white shadow-lg mt-16">
-        <h1 class="font-titre text-3xl md:text-4xl font-bold">Galerie Photo</h1>
-        <p class="mt-1 text-sm opacity-90">Découvrez la vie du Rucher École du Var en images</p>
+        <h1 class="font-titre text-3xl md:text-4xl font-bold">Galerie Photo & Vidéo</h1>
+        <p class="mt-1 text-sm opacity-90">Découvrez la vie du Rucher École du Var en images et en vidéos</p>
     </header>
 
     <main class="flex-1 pb-12 pt-8 px-4 md:px-8">
@@ -166,16 +206,21 @@
         </div>
     </main>
 
-    <!-- Modal pour afficher les photos en grand -->
+    <!-- Modal pour afficher les photos/vidéos en grand -->
     <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-75 modal-backdrop hidden items-center justify-center z-50 p-4">
-        <div class="relative max-w-4xl max-h-full">
+        <div class="relative w-full max-w-4xl">
             <button id="closeModal" class="absolute top-4 right-4 text-white text-4xl hover:text-gamboge z-10">
                 &times;
             </button>
-            <img id="modalImage" src="" alt="" class="max-w-full max-h-full rounded-lg">
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
-                <h3 id="modalTitle" class="text-white text-xl font-bold mb-2"></h3>
-                <p id="modalDescription" class="text-white/90"></p>
+            <!-- Contenu image -->
+            <img id="modalImage" src="" alt="" class="max-w-full max-h-[80vh] rounded-lg mx-auto block">
+            <!-- Contenu vidéo -->
+            <div id="modalVideoWrapper" class="video-embed-wrapper hidden">
+                <!-- Rempli dynamiquement -->
+            </div>
+            <div class="mt-3 px-2">
+                <h3 id="modalTitle" class="text-white text-xl font-bold mb-1"></h3>
+                <p id="modalDescription" class="text-white/90 text-sm"></p>
                 <span id="modalCategory" class="inline-block mt-2 bg-gamboge text-black px-3 py-1 rounded-full text-sm font-bold"></span>
             </div>
         </div>
@@ -189,64 +234,135 @@
         let allPhotos = [];
         let currentFilter = 'all';
 
-        // Charger les photos depuis l'API Netlify
+        // Extraire l'ID YouTube depuis une URL
+        function getYoutubeId(url) {
+            const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+            return m ? m[1] : null;
+        }
+
+        // Extraire l'ID Vimeo depuis une URL
+        function getVimeoId(url) {
+            const m = url.match(/vimeo\.com\/(\d+)/);
+            return m ? m[1] : null;
+        }
+
+        // Extraire l'ID Google Drive depuis une URL
+        function getDriveId(url) {
+            const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([^/&?]+)/);
+            return m ? m[1] : null;
+        }
+
+        // Retourner la vignette d'une vidéo (image ou null)
+        function getVideoThumbnail(url) {
+            if (!url) return null;
+            const ytId = getYoutubeId(url);
+            if (ytId) return `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+            return null;
+        }
+
+        // Générer le HTML du lecteur vidéo pour la modal
+        function buildVideoPlayer(url) {
+            const ytId = getYoutubeId(url);
+            if (ytId) {
+                return `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            }
+            const vimeoId = getVimeoId(url);
+            if (vimeoId) {
+                return `<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+            }
+            const driveId = getDriveId(url);
+            if (driveId) {
+                return `<iframe src="https://drive.google.com/file/d/${driveId}/preview" frameborder="0" allow="autoplay" allowfullscreen></iframe>`;
+            }
+            // Vidéo directe (mp4, webm…)
+            return `<video controls autoplay src="${url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:0.5rem;"></video>`;
+        }
+
+        // Charger les photos/vidéos depuis l'API Netlify
         async function loadPhotos() {
             try {
                 const response = await fetch('/.netlify/functions/photos');
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 let photos = await response.json();
 
-                // Assigner la displayUrl
                 photos = photos.map(photo => ({
                     ...photo,
-                    displayUrl: photo.image_data ? `data:${photo.mime_type};base64,${photo.image_data}` : `assets/images/${photo.url}`
+                    mediaType: photo.media_type || 'image',
+                    displayUrl: photo.image_data
+                        ? `data:${photo.mime_type};base64,${photo.image_data}`
+                        : (photo.url || '')
                 }));
 
-                const galleryContainer = document.getElementById('gallery-container');
-                const filterButtons = document.querySelectorAll('.filter-btn');
-                
                 allPhotos = photos;
                 displayPhotos(currentFilter);
             } catch (error) {
-                console.error('Erreur lors du chargement des photos:', error);
-                // Photos par défaut en cas d'erreur
-                const fallbackPhotos = [
-                    { id: 1, title: 'Ruches en activité', description: 'Vue d\'ensemble de notre rucher école', url: 'assets/images/saintraphphoto.jpg', category: 'rucher' },
-                    { id: 2, title: 'Formation débutants', description: 'Séance de formation pour nouveaux apiculteurs', url: 'assets/images/saintraphresize.jpg', category: 'formation' },
-                    { id: 3, title: 'Récolte de miel', description: 'Extraction du miel lors de la récolte d\'été', url: 'assets/images/imagebackground.png', category: 'apiculture' }
-                ];
+                console.error('Erreur lors du chargement des médias:', error);
                 displayPhotos(currentFilter);
             }
         }
 
-        // Afficher les photos selon le filtre
+        // Afficher les photos/vidéos selon le filtre
         function displayPhotos(filter) {
             const photosGrid = document.getElementById('photosGrid');
-            let filteredPhotos = filter === 'all' ? allPhotos : allPhotos.filter(photo => photo.category === filter);
-            
-            if (filteredPhotos.length === 0) {
+            let filtered = filter === 'all' ? allPhotos : allPhotos.filter(m => m.category === filter);
+
+            if (filtered.length === 0) {
                 photosGrid.innerHTML = `
                     <div class="col-span-full text-center py-8">
-                        <p class="text-gray-600">Aucune photo dans cette catégorie</p>
-                    </div>
-                `;
+                        <p class="text-gray-600">Aucun média dans cette catégorie</p>
+                    </div>`;
                 return;
             }
 
-            photosGrid.innerHTML = filteredPhotos.map(photo => `
-                <div class="photo-item bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="openModal(${photo.id})">
-                    <div class="aspect-square overflow-hidden">
-                        <img src="${photo.displayUrl || photo.url}" alt="${photo.title}" loading="lazy" class="w-full h-full object-cover">
+            photosGrid.innerHTML = filtered.map(item => {
+                const isVideo = item.mediaType === 'video';
+                let thumbHtml;
+
+                if (isVideo) {
+                    const thumb = getVideoThumbnail(item.displayUrl);
+                    if (thumb) {
+                        thumbHtml = `
+                            <div class="relative w-full h-full">
+                                <img src="${thumb}" alt="${item.title}" loading="lazy" class="w-full h-full object-cover">
+                                <div class="video-overlay">
+                                    <div class="play-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
+                                </div>
+                            </div>`;
+                    } else {
+                        thumbHtml = `
+                            <div class="relative w-full h-full bg-gray-900 flex items-center justify-center">
+                                <div class="play-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>`;
+                    }
+                } else {
+                    thumbHtml = `<img src="${item.displayUrl}" alt="${item.title}" loading="lazy" class="w-full h-full object-cover">`;
+                }
+
+                const badge = isVideo
+                    ? `<span class="inline-block bg-seal/10 text-seal px-2 py-1 rounded-full text-xs font-bold mr-1">Vidéo</span>`
+                    : '';
+
+                return `
+                <div class="photo-item bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="openModal(${item.id})">
+                    <div class="aspect-square overflow-hidden relative">
+                        ${thumbHtml}
                     </div>
                     <div class="p-4">
-                        <h3 class="font-bold text-seal mb-2">${photo.title}</h3>
-                        <p class="text-gray-600 text-sm mb-2">${photo.description || 'Aucune description'}</p>
-                        <span class="inline-block bg-gamboge/20 text-gamboge px-2 py-1 rounded-full text-xs font-bold">
-                            ${getCategoryLabel(photo.category)}
-                        </span>
+                        <h3 class="font-bold text-seal mb-2">${item.title}</h3>
+                        <p class="text-gray-600 text-sm mb-2">${item.description || 'Aucune description'}</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${badge}
+                            <span class="inline-block bg-gamboge/20 text-gamboge px-2 py-1 rounded-full text-xs font-bold">
+                                ${getCategoryLabel(item.category)}
+                            </span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         // Obtenir le label de la catégorie
@@ -261,16 +377,29 @@
         }
 
         // Ouvrir la modal
-        function openModal(photoId) {
-            const photo = allPhotos.find(p => p.id === photoId);
-            if (!photo) return;
+        function openModal(itemId) {
+            const item = allPhotos.find(p => p.id === itemId);
+            if (!item) return;
 
-            document.getElementById('modalImage').src = photo.displayUrl || photo.url;
-            document.getElementById('modalImage').alt = photo.title;
-            document.getElementById('modalTitle').textContent = photo.title;
-            document.getElementById('modalDescription').textContent = photo.description || 'Aucune description';
-            document.getElementById('modalCategory').textContent = getCategoryLabel(photo.category);
-            
+            const modalImage = document.getElementById('modalImage');
+            const modalVideoWrapper = document.getElementById('modalVideoWrapper');
+
+            document.getElementById('modalTitle').textContent = item.title;
+            document.getElementById('modalDescription').textContent = item.description || '';
+            document.getElementById('modalCategory').textContent = getCategoryLabel(item.category);
+
+            if (item.mediaType === 'video') {
+                modalImage.classList.add('hidden');
+                modalVideoWrapper.classList.remove('hidden');
+                modalVideoWrapper.innerHTML = buildVideoPlayer(item.displayUrl);
+            } else {
+                modalVideoWrapper.classList.add('hidden');
+                modalVideoWrapper.innerHTML = '';
+                modalImage.classList.remove('hidden');
+                modalImage.src = item.displayUrl;
+                modalImage.alt = item.title;
+            }
+
             document.getElementById('photoModal').classList.remove('hidden');
             document.getElementById('photoModal').classList.add('flex');
             document.body.style.overflow = 'hidden';
@@ -280,6 +409,7 @@
         function closeModal() {
             document.getElementById('photoModal').classList.add('hidden');
             document.getElementById('photoModal').classList.remove('flex');
+            document.getElementById('modalVideoWrapper').innerHTML = '';
             document.body.style.overflow = 'auto';
         }
 
