@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Configuration Neon PostgreSQL
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL || 'postgresql://neondb_owner:npg_n51StIYyoKkV@ep-lingering-snowflake-ae815a6g-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require',
+  connectionString: process.env.NETLIFY_DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 

@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Configuration Neon PostgreSQL
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL || 'postgresql://neondb_owner:npg_n51StIYyoKkV@ep-lingering-snowflake-ae815a6g-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require',
+  connectionString: process.env.NETLIFY_DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
@@ -131,6 +131,14 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ error: 'Unauthorized' })
           };
         }
+        if (authUser.role !== 'admin') {
+          console.log(`[CALENDAR_SECURITY] ${new Date().toISOString()} - Forbidden: role '${authUser.role}' tried POST from ${clientIP}`);
+          return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Forbidden' })
+          };
+        }
 
         // Validation des données
         const validation = validateEventData(parsedBody);
@@ -174,6 +182,14 @@ exports.handler = async (event, context) => {
             statusCode: 401,
             headers,
             body: JSON.stringify({ error: 'Unauthorized' })
+          };
+        }
+        if (putAuthUser.role !== 'admin') {
+          console.log(`[CALENDAR_SECURITY] ${new Date().toISOString()} - Forbidden: role '${putAuthUser.role}' tried PUT from ${clientIP}`);
+          return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Forbidden' })
           };
         }
 
@@ -238,6 +254,14 @@ exports.handler = async (event, context) => {
             statusCode: 401,
             headers,
             body: JSON.stringify({ error: 'Unauthorized' })
+          };
+        }
+        if (deleteAuthUser.role !== 'admin') {
+          console.log(`[CALENDAR_SECURITY] ${new Date().toISOString()} - Forbidden: role '${deleteAuthUser.role}' tried DELETE from ${clientIP}`);
+          return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ error: 'Forbidden' })
           };
         }
 
