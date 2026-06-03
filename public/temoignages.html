@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Témoignages - Rucher-École du Var</title>
+    <meta name="description" content="Partagez votre expérience avec le Rucher-École du Var. Lisez les témoignages de nos adhérents et apprenants apiculteurs.">
+    <link rel="icon" href="assets/images/Sans-titrelogo-seul-removebg-preview.png" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wheat': '#E8D7A8',
+                        'raw': '#816557',
+                        'seal': '#561F04',
+                        'gamboge': '#F6A01F',
+                        'tigers': '#BA6E1F',
+                        'miel': '#F6A01F',
+                        'fond-clair': '#F5F5F5',
+                    },
+                    fontFamily: {
+                        'titre': ['Montserrat', 'sans-serif'],
+                        'corps': ['Lato', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #F6A01F 0%, #BA6E1F 100%); border-radius: 6px; border: 2px solid #f1f1f1; }
+        html { scrollbar-width: thin; scrollbar-color: #F6A01F #f1f1f1; }
+
+        .card-temoignage {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-left: 4px solid #F6A01F;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-temoignage:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        .card-temoignage.masque { border-left-color: #9ca3af; opacity: 0.65; }
+
+        .photo-preview { max-height: 200px; border-radius: 0.5rem; object-fit: cover; }
+    </style>
+</head>
+<body class="bg-fond-clair font-corps text-gray-800">
+
+    <!-- ── Navigation ─────────────────────────────────────────── -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-titre font-bold text-seal">Rucher-École du VAR</a>
+
+            <div class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+                <a href="index.html" class="text-gray-600 hover:text-miel transition-colors">Accueil</a>
+                <a href="formulaires.html" class="text-gray-600 hover:text-miel transition-colors">Formulaires & Fiches</a>
+                <a href="galerie.html" class="text-gray-600 hover:text-miel transition-colors">Galerie photo</a>
+                <a href="planning.html" class="text-gray-600 hover:text-miel transition-colors">Planning</a>
+                <a href="annonces.html" class="text-gray-600 hover:text-miel transition-colors">Annonces</a>
+                <a href="temoignages.html" class="text-miel font-bold border-b-2 border-miel pb-0.5">Témoignages</a>
+                <a href="index.html#contact" class="text-gray-600 hover:text-miel transition-colors">Contact</a>
+            </div>
+
+            <a href="COTISATION_2026_RE.pdf" target="_blank" download
+               class="hidden md:block bg-miel text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition-colors text-sm">
+                Devenir Adhérent
+            </a>
+
+            <button id="menuToggle" class="md:hidden text-seal focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </nav>
+
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t text-sm font-semibold">
+            <a href="index.html" class="block py-2 px-4 hover:bg-fond-clair">Accueil</a>
+            <a href="formulaires.html" class="block py-2 px-4 hover:bg-fond-clair">Formulaires & Fiches</a>
+            <a href="galerie.html" class="block py-2 px-4 hover:bg-fond-clair">Galerie photo</a>
+            <a href="planning.html" class="block py-2 px-4 hover:bg-fond-clair">Planning</a>
+            <a href="annonces.html" class="block py-2 px-4 hover:bg-fond-clair">Petites Annonces</a>
+            <a href="temoignages.html" class="block py-2 px-4 bg-miel/10 text-miel font-bold">Témoignages</a>
+            <a href="index.html#contact" class="block py-2 px-4 hover:bg-fond-clair">Contact</a>
+            <a href="COTISATION_2026_RE.pdf" target="_blank" download class="block py-2 px-4 bg-miel/20 font-bold hover:bg-miel/40">Devenir Adhérent</a>
+        </div>
+    </header>
+
+    <!-- ── Hero ──────────────────────────────────────────────── -->
+    <section class="bg-seal text-white py-14 px-6 text-center">
+        <div class="container mx-auto max-w-2xl">
+            <div class="text-5xl mb-4">🍯</div>
+            <h1 class="text-3xl md:text-4xl font-titre font-bold mb-3">Témoignages</h1>
+            <p class="text-wheat text-lg">Partagez votre expérience et lisez les avis de nos membres apiculteurs.</p>
+        </div>
+    </section>
+
+    <!-- ── Compteur ───────────────────────────────────────────── -->
+    <section class="bg-white py-6 border-b">
+        <div class="container mx-auto px-6 max-w-4xl text-center">
+            <span id="statCount" class="text-2xl font-titre font-bold text-seal">—</span>
+            <span class="text-gray-500 ml-2">témoignage(s) partagé(s)</span>
+        </div>
+    </section>
+
+    <!-- ── Contenu principal ─────────────────────────────────── -->
+    <main class="container mx-auto px-6 py-12 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            <!-- Formulaire -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24" data-aos="fade-right">
+                    <h2 class="text-xl font-titre font-bold text-seal mb-5">Laisser un avis</h2>
+
+                    <div id="formSuccess" class="hidden bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-4 text-sm">
+                        ✅ Merci pour votre témoignage ! Il est maintenant visible.
+                    </div>
+                    <div id="formError" class="hidden bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-4 text-sm"></div>
+
+                    <form id="temoignageForm" novalidate>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Prénom <span class="text-red-500">*</span></label>
+                                <input id="inputPrenom" type="text" maxlength="100" placeholder="Marie"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-miel focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nom <span class="text-red-500">*</span></label>
+                                <input id="inputNom" type="text" maxlength="100" placeholder="Dupont"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-miel focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Votre message <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="inputMessage" rows="5" maxlength="2000"
+                                placeholder="Partagez votre expérience avec le Rucher-École du Var…"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-miel focus:border-transparent resize-none"></textarea>
+                            <p id="charCount" class="text-xs text-gray-400 mt-1 text-right">0 / 2000</p>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Photo <span class="text-gray-400 font-normal">(optionnel, max 2 Mo)</span>
+                            </label>
+                            <input id="inputPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+                                class="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-miel/20 file:text-seal hover:file:bg-miel/40 cursor-pointer">
+                            <div id="photoPreviewWrap" class="hidden mt-2">
+                                <img id="photoPreview" class="photo-preview w-full" alt="Aperçu photo">
+                                <button type="button" id="removePhoto" class="mt-1 text-xs text-red-500 hover:underline">Supprimer la photo</button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn"
+                            class="w-full bg-seal text-white font-bold py-3 px-6 rounded-xl hover:bg-raw transition-colors flex items-center justify-center gap-2">
+                            <span id="submitText">Publier mon témoignage</span>
+                            <svg id="submitSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des témoignages -->
+            <div class="lg:col-span-2">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-titre font-bold text-seal">Ce que disent nos membres</h2>
+                    <button id="adminModeBtn" class="hidden text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors font-semibold">
+                        ⚙ Gestion admin
+                    </button>
+                </div>
+
+                <div id="loadingState" class="flex flex-col items-center justify-center py-16 text-gray-400">
+                    <svg class="w-8 h-8 animate-spin mb-3" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    Chargement…
+                </div>
+
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-16 text-gray-400 text-center">
+                    <div class="text-5xl mb-4">🐝</div>
+                    <p class="text-lg font-semibold">Soyez le premier à témoigner !</p>
+                    <p class="text-sm mt-1">Partagez votre expérience avec notre rucher-école.</p>
+                </div>
+
+                <div id="temoignagesList" class="space-y-5"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ── Footer ─────────────────────────────────────────────── -->
+    <footer class="bg-gray-800 text-gray-400 py-10 mt-16">
+        <div class="container mx-auto px-6 text-center text-sm">
+            <p class="font-titre text-white text-lg mb-2">Rucher-École du VAR</p>
+            <p>Saint-Raphaël, Var (83)</p>
+            <p class="mt-3">&copy; 2025 Rucher-École de Saint-Raphaël |
+                <a href="https://creationeditionbroderie.com/" target="_blank" class="hover:text-miel">Réalisé par Création édition & broderie</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true });
+
+        const API = '/.netlify/functions/temoignages';
+        const authToken = localStorage.getItem('authToken');
+        let adminMode = false;
+        let allTemoignages = [];
+
+        // photo sélectionnée
+        let photoData = null, photoName = null, photoMime = null;
+
+        // ── Mobile menu ────────────────────────────────────────
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        // ── Compteur de caractères ─────────────────────────────
+        const inputMessage = document.getElementById('inputMessage');
+        document.getElementById('inputMessage').addEventListener('input', () => {
+            document.getElementById('charCount').textContent = `${inputMessage.value.length} / 2000`;
+        });
+
+        // ── Gestion photo ──────────────────────────────────────
+        const inputPhoto = document.getElementById('inputPhoto');
+        inputPhoto.addEventListener('change', () => {
+            const file = inputPhoto.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                alert('La photo dépasse 2 Mo. Veuillez en choisir une plus légère.');
+                inputPhoto.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photoData = e.target.result; // data:image/...;base64,...
+                photoMime = file.type;
+                photoName = file.name;
+                document.getElementById('photoPreview').src = photoData;
+                document.getElementById('photoPreviewWrap').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('removePhoto').addEventListener('click', () => {
+            photoData = null; photoName = null; photoMime = null;
+            inputPhoto.value = '';
+            document.getElementById('photoPreviewWrap').classList.add('hidden');
+        });
+
+        // ── Chargement des témoignages ─────────────────────────
+        async function loadTemoignages() {
+            try {
+                const res = await fetch(API);
+                allTemoignages = await res.json();
+                renderTemoignages();
+                updateStats();
+            } catch {
+                document.getElementById('loadingState').innerHTML =
+                    '<p class="text-red-500 text-sm">Impossible de charger les témoignages.</p>';
+            }
+        }
+
+        // En mode admin, on charge TOUS (visible + masqués) via un endpoint dédié
+        async function loadAllTemoignagesAdmin() {
+            try {
+                const res = await fetch(API + '?admin=1', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                allTemoignages = await res.json();
+                renderTemoignages();
+                updateStats();
+            } catch {
+                loadTemoignages();
+            }
+        }
+
+        function renderTemoignages() {
+            const list = document.getElementById('temoignagesList');
+            const loading = document.getElementById('loadingState');
+            const empty = document.getElementById('emptyState');
+
+            loading.classList.add('hidden');
+
+            if (allTemoignages.length === 0) {
+                empty.classList.remove('hidden');
+                list.innerHTML = '';
+                return;
+            }
+            empty.classList.add('hidden');
+            list.innerHTML = allTemoignages.map(t => cardHTML(t)).join('');
+
+            if (adminMode) {
+                list.querySelectorAll('[data-action="masquer"]').forEach(btn => {
+                    btn.classList.remove('hidden');
+                    btn.addEventListener('click', () => toggleVisibility(Number(btn.dataset.id), btn.dataset.visible === 'true'));
+                });
+                list.querySelectorAll('[data-action="supprimer"]').forEach(btn => {
+                    btn.classList.remove('hidden');
+                    btn.addEventListener('click', () => deleteTemoignage(Number(btn.dataset.id)));
+                });
+            }
+        }
+
+        function cardHTML(t) {
+            const date = new Date(t.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+            const visible = t.visible !== false;
+            const masqueClass = !visible ? ' masque' : '';
+            const masqueBtnLabel = visible ? 'Masquer' : 'Afficher';
+            const photoHTML = t.photo_data
+                ? `<img src="${t.photo_data}" alt="Photo de ${escHtml(t.prenom)}" class="photo-preview mt-3 w-full">`
+                : '';
+
+            return `
+            <div class="card-temoignage${masqueClass}" data-aos="fade-up">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-seal text-white flex items-center justify-center font-bold text-sm uppercase">
+                        ${escHtml(t.prenom.charAt(0))}${escHtml(t.nom.charAt(0))}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <span class="font-bold text-seal">${escHtml(t.prenom)} ${escHtml(t.nom)}</span>
+                            ${!visible ? '<span class="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Masqué</span>' : ''}
+                        </div>
+                        <p class="text-gray-700 text-sm leading-relaxed mt-2">${escHtml(t.message)}</p>
+                        ${photoHTML}
+                        <p class="text-xs text-gray-400 mt-3">${date}</p>
+
+                        <!-- Boutons admin -->
+                        <div class="hidden flex gap-2 mt-3" id="admin-actions-${t.id}">
+                            <button data-action="masquer" data-id="${t.id}" data-visible="${visible}"
+                                class="hidden text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-3 py-1 rounded-full hover:bg-yellow-100 transition-colors font-semibold">
+                                ${masqueBtnLabel}
+                            </button>
+                            <button data-action="supprimer" data-id="${t.id}"
+                                class="hidden text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded-full hover:bg-red-100 transition-colors font-semibold">
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function escHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function updateStats() {
+            document.getElementById('statCount').textContent = allTemoignages.filter(t => t.visible !== false).length;
+        }
+
+        // ── Soumission du formulaire ───────────────────────────
+        document.getElementById('temoignageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nom    = document.getElementById('inputNom').value.trim();
+            const prenom = document.getElementById('inputPrenom').value.trim();
+            const message = inputMessage.value.trim();
+
+            const errorBox   = document.getElementById('formError');
+            const successBox = document.getElementById('formSuccess');
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+
+            if (!prenom || prenom.length < 2) {
+                errorBox.textContent = 'Veuillez indiquer votre prénom (2 caractères minimum).';
+                errorBox.classList.remove('hidden'); return;
+            }
+            if (!nom || nom.length < 2) {
+                errorBox.textContent = 'Veuillez indiquer votre nom (2 caractères minimum).';
+                errorBox.classList.remove('hidden'); return;
+            }
+            if (!message || message.length < 10) {
+                errorBox.textContent = 'Votre message doit contenir au moins 10 caractères.';
+                errorBox.classList.remove('hidden'); return;
+            }
+
+            const submitBtn     = document.getElementById('submitBtn');
+            const submitText    = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            submitBtn.disabled = true;
+            submitText.textContent = 'Publication…';
+            submitSpinner.classList.remove('hidden');
+
+            const payload = { nom, prenom, message };
+            if (photoData) {
+                payload.photo_data = photoData;
+                payload.photo_name = photoName;
+                payload.photo_mime = photoMime;
+            }
+
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur serveur');
+                }
+
+                const newT = await res.json();
+                allTemoignages.unshift(newT);
+                renderTemoignages();
+                updateStats();
+
+                successBox.classList.remove('hidden');
+                e.target.reset();
+                photoData = null; photoName = null; photoMime = null;
+                document.getElementById('photoPreviewWrap').classList.add('hidden');
+                document.getElementById('charCount').textContent = '0 / 2000';
+                successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (err) {
+                errorBox.textContent = err.message || 'Une erreur est survenue. Réessayez.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Publier mon témoignage';
+                submitSpinner.classList.add('hidden');
+            }
+        });
+
+        // ── Mode admin ─────────────────────────────────────────
+        const adminModeBtn = document.getElementById('adminModeBtn');
+
+        if (authToken) {
+            fetch('/.netlify/functions/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', token: authToken })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.valid && data.user?.role === 'admin') {
+                    adminModeBtn.classList.remove('hidden');
+                }
+            })
+            .catch(() => {});
+        }
+
+        adminModeBtn.addEventListener('click', () => {
+            adminMode = !adminMode;
+            adminModeBtn.textContent = adminMode ? '✓ Admin actif' : '⚙ Gestion admin';
+            adminModeBtn.classList.toggle('bg-red-200', adminMode);
+
+            // Afficher/masquer les boutons d'action
+            document.querySelectorAll('[data-action="masquer"], [data-action="supprimer"]').forEach(btn => {
+                btn.classList.toggle('hidden', !adminMode);
+            });
+        });
+
+        async function toggleVisibility(id, currentVisible) {
+            const newVisible = !currentVisible;
+            try {
+                const res = await fetch(API, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ id, visible: newVisible })
+                });
+                if (!res.ok) throw new Error();
+                const t = allTemoignages.find(t => t.id === id);
+                if (t) t.visible = newVisible;
+                renderTemoignages();
+                if (adminMode) {
+                    document.querySelectorAll('[data-action="masquer"], [data-action="supprimer"]').forEach(btn => {
+                        btn.classList.remove('hidden');
+                    });
+                }
+            } catch {
+                alert('Erreur lors de la mise à jour.');
+            }
+        }
+
+        async function deleteTemoignage(id) {
+            if (!confirm('Supprimer définitivement ce témoignage ?')) return;
+            try {
+                const res = await fetch(API, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ id })
+                });
+                if (!res.ok) throw new Error();
+                allTemoignages = allTemoignages.filter(t => t.id !== id);
+                renderTemoignages();
+                updateStats();
+                if (adminMode) {
+                    document.querySelectorAll('[data-action="masquer"], [data-action="supprimer"]').forEach(btn => {
+                        btn.classList.remove('hidden');
+                    });
+                }
+            } catch {
+                alert('Erreur lors de la suppression.');
+            }
+        }
+
+        // ── Init ───────────────────────────────────────────────
+        loadTemoignages();
+    </script>
+</body>
+</html>
