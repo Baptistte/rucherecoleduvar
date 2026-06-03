@@ -128,6 +128,9 @@
                         <button class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="photos">
                             Photos
                         </button>
+                        <button class="tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="temoignages">
+                            Témoignages
+                        </button>
                     </nav>
                 </div>
             </div>
@@ -163,6 +166,18 @@
                  </button>
              </div>
              <div id="photosList" class="space-y-4"></div>
+            </div>
+
+            <!-- Section Témoignages -->
+            <div id="temoignagesTab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-titre text-2xl font-bold">Gestion des Témoignages</h2>
+                    <div class="flex items-center gap-3">
+                        <span id="temoignagesCount" class="text-sm text-gray-500"></span>
+                        <a href="temoignages.html" target="_blank" class="text-sm text-gamboge hover:underline">Voir la page publique →</a>
+                    </div>
+                </div>
+                <div id="temoignagesList" class="space-y-4"></div>
             </div>
         </div>
     </div>
@@ -403,6 +418,7 @@
             loadCalendarEvents();
             loadDocuments();
             loadPhotos();
+            loadTemoignages();
         };
 
         // Connexion
@@ -455,10 +471,8 @@
                 });
                 document.getElementById(tabName + 'Tab').classList.remove('hidden');
                 
-                // Charger les données pour l'onglet photos si nécessaire
-                if (tabName === 'photos') {
-                    loadPhotos();
-                }
+                if (tabName === 'photos') loadPhotos();
+                if (tabName === 'temoignages') loadTemoignages();
             });
         });
 
@@ -1155,6 +1169,120 @@
                     body: JSON.stringify({ id })
                 });
                 loadPhotos();
+            }
+        };
+
+        // ===================================
+        // GESTION DES TÉMOIGNAGES
+        // ===================================
+
+        const loadTemoignages = async () => {
+            const list = document.getElementById('temoignagesList');
+            const countEl = document.getElementById('temoignagesCount');
+            list.innerHTML = '<div class="text-center text-gray-500">Chargement...</div>';
+
+            try {
+                const temoignages = await apiCall('/temoignages');
+                list.innerHTML = '';
+
+                const total = temoignages.length;
+                const visibles = temoignages.filter(t => t.visible !== false).length;
+                const masques = total - visibles;
+                countEl.textContent = `${total} témoignage(s) — ${visibles} visible(s), ${masques} masqué(s)`;
+
+                if (total === 0) {
+                    list.innerHTML = '<div class="text-center text-gray-400 py-8">Aucun témoignage pour l\'instant.</div>';
+                    return;
+                }
+
+                temoignages.forEach(t => {
+                    list.appendChild(createTemoignageElement(t));
+                });
+            } catch (error) {
+                list.innerHTML = '<div class="text-red-600">Erreur de chargement des témoignages.</div>';
+            }
+        };
+
+        const createTemoignageElement = (t) => {
+            const div = document.createElement('div');
+            const visible = t.visible !== false;
+            const date = new Date(t.created_at).toLocaleDateString('fr-FR', {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            div.className = `bg-white p-4 rounded-lg shadow border-l-4 ${visible ? 'border-gamboge' : 'border-gray-300 opacity-60'}`;
+
+            const photoHTML = t.photo_data
+                ? `<img src="${t.photo_data}" alt="Photo" class="w-16 h-16 object-cover rounded border flex-shrink-0">`
+                : '';
+
+            div.innerHTML = `
+                <div class="flex items-start gap-4">
+                    ${photoHTML ? `<div class="flex-shrink-0">${photoHTML}</div>` : ''}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="font-bold text-seal">${escapeHtml(t.prenom)} ${escapeHtml(t.nom)}</span>
+                            ${!visible ? '<span class="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Masqué</span>' : '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Visible</span>'}
+                            <span class="text-xs text-gray-400 ml-auto">${date}</span>
+                        </div>
+                        <p class="text-sm text-gray-700 mt-1 leading-relaxed">${escapeHtml(t.message)}</p>
+                    </div>
+                    <div class="flex flex-col gap-2 flex-shrink-0">
+                        <button class="toggle-visibility-btn text-sm px-3 py-1 rounded border font-medium transition-colors
+                            ${visible ? 'text-yellow-700 border-yellow-300 hover:bg-yellow-50' : 'text-green-700 border-green-300 hover:bg-green-50'}"
+                            data-id="${t.id}" data-visible="${visible}">
+                            ${visible ? 'Masquer' : 'Afficher'}
+                        </button>
+                        <button class="delete-temoignage-btn text-sm px-3 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50 font-medium transition-colors"
+                            data-id="${t.id}">
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            div.querySelector('.toggle-visibility-btn').addEventListener('click', (e) => {
+                const id = Number(e.target.dataset.id);
+                const currentVisible = e.target.dataset.visible === 'true';
+                window.toggleTemoignageVisibility(id, currentVisible);
+            });
+
+            div.querySelector('.delete-temoignage-btn').addEventListener('click', (e) => {
+                window.deleteTemoignage(Number(e.target.dataset.id));
+            });
+
+            return div;
+        };
+
+        const escapeHtml = (str) => String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+        window.toggleTemoignageVisibility = async (id, currentVisible) => {
+            try {
+                await apiCall('/temoignages', {
+                    method: 'PATCH',
+                    body: JSON.stringify({ id, visible: !currentVisible })
+                });
+                loadTemoignages();
+            } catch (error) {
+                alert('Erreur lors de la mise à jour de la visibilité.');
+            }
+        };
+
+        window.deleteTemoignage = async (id) => {
+            if (confirm('Supprimer définitivement ce témoignage ? Cette action est irréversible.')) {
+                try {
+                    await apiCall('/temoignages', {
+                        method: 'DELETE',
+                        body: JSON.stringify({ id })
+                    });
+                    loadTemoignages();
+                } catch (error) {
+                    alert('Erreur lors de la suppression.');
+                }
             }
         };
 

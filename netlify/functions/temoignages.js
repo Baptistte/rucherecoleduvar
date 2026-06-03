@@ -83,14 +83,22 @@ exports.handler = async (event) => {
     }
 
     switch (httpMethod) {
-      // ── GET : liste publique (visible uniquement) ─────────────
+      // ── GET : liste publique (visible) ou complète (admin) ───────
       case 'GET': {
-        const result = await pool.query(
-          `SELECT id, nom, prenom, message, photo_data, photo_name, photo_mime, created_at
-           FROM temoignages
-           WHERE visible = true
-           ORDER BY created_at DESC`
-        );
+        const token = reqHeaders.authorization?.replace('Bearer ', '');
+        const authUser = token ? verifyAuth(token, clientIP) : null;
+        const isAdmin = authUser?.role === 'admin';
+
+        const result = isAdmin
+          ? await pool.query(
+              `SELECT id, nom, prenom, message, photo_data, photo_name, photo_mime, visible, created_at
+               FROM temoignages ORDER BY created_at DESC`
+            )
+          : await pool.query(
+              `SELECT id, nom, prenom, message, photo_data, photo_name, photo_mime, created_at
+               FROM temoignages WHERE visible = true ORDER BY created_at DESC`
+            );
+
         return { statusCode: 200, headers, body: JSON.stringify(result.rows) };
       }
 
