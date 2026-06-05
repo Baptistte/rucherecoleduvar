@@ -24,6 +24,58 @@
 
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD
+  }
+});
+
+const sendNotificationEmail = async (prenom, nom, message, hasPhoto) => {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return;
+
+  const date = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+
+  await transporter.sendMail({
+    from: `"Rucher-École du VAR" <${process.env.GMAIL_USER}>`,
+    to: 'baptistegrincourt@gmail.com',
+    subject: `🍯 Nouveau témoignage de ${prenom} ${nom}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #561F04; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+          <h2 style="margin: 0;">🍯 Nouveau témoignage</h2>
+          <p style="margin: 5px 0 0; opacity: 0.8;">Rucher-École du VAR</p>
+        </div>
+        <div style="background: white; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+          <p style="color: #6b7280; font-size: 14px; margin-top: 0;">Reçu le ${date}</p>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280; width: 80px;">Prénom</td>
+              <td style="padding: 8px 0; font-weight: bold;">${prenom}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #6b7280;">Nom</td>
+              <td style="padding: 8px 0; font-weight: bold;">${nom}</td>
+            </tr>
+            ${hasPhoto ? '<tr><td style="padding: 8px 0; color: #6b7280;">Photo</td><td style="padding: 8px 0;">✅ Oui</td></tr>' : ''}
+          </table>
+          <div style="background: #f9fafb; border-left: 4px solid #F6A01F; padding: 16px; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; color: #374151; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
+          </div>
+          <div style="margin-top: 24px; text-align: center;">
+            <a href="https://rucherecoleduvar.com/gestion-ne6rshum9w-9t1fhqm3x7.html"
+               style="background: #561F04; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+              Gérer les témoignages
+            </a>
+          </div>
+        </div>
+      </div>
+    `
+  });
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -140,6 +192,11 @@ exports.handler = async (event) => {
         );
 
         console.log(`[TEMOIGNAGES_CREATE] ${new Date().toISOString()} - Témoignage de "${prenom} ${nom}" depuis ${clientIP}`);
+
+        sendNotificationEmail(prenom, nom, message, !!photoData).catch(err =>
+          console.error(`[TEMOIGNAGES_MAIL] ${new Date().toISOString()} - Erreur envoi mail: ${err.message}`)
+        );
+
         return { statusCode: 201, headers, body: JSON.stringify(result.rows[0]) };
       }
 

@@ -9,9 +9,10 @@
     "deploy": "netlify deploy --prod"
   },
   "dependencies": {
-    "pg": "^8.11.3",
+    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3"
+    "nodemailer": "^8.0.10",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"
@@ -25,4 +26,4 @@
   ],
   "author": "Rucher-École du VAR",
   "license": "MIT"
-} 
+}
