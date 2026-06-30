@@ -187,33 +187,73 @@ exports.handler = async (event, context) => {
     }
 
     switch (httpMethod) {
-      case 'GET':
-        // Récupérer toutes les photos (public)
+      case 'GET': {
+        const queryId = event.queryStringParameters?.id;
+        const serveImage = event.queryStringParameters?.serve === '1';
+
+        // Servir l'image brute (binaire) — utilisé comme src d'une balise <img>
+        if (queryId && serveImage) {
+          if (!validateId(queryId)) {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid ID' }) };
+          }
+          try {
+            const result = await pool.query(
+              'SELECT image_data, mime_type FROM photos WHERE id = $1',
+              [queryId]
+            );
+            if (!result.rows[0] || !result.rows[0].image_data) {
+              return { statusCode: 404, headers, body: JSON.stringify({ error: 'Image not found' }) };
+            }
+            return {
+              statusCode: 200,
+              headers: { ...headers, 'Content-Type': result.rows[0].mime_type, 'Cache-Control': 'public, max-age=86400' },
+              body: result.rows[0].image_data,
+              isBase64Encoded: true
+            };
+          } catch (dbError) {
+            console.error(`[PHOTOS_DB_ERROR] ${new Date().toISOString()} - Serve error: ${dbError.message}`);
+            return { statusCode: 500, headers, body: JSON.stringify({ error: 'Database error' }) };
+          }
+        }
+
+        // Photo unique avec image_data — pour le mode édition admin
+        if (queryId) {
+          if (!validateId(queryId)) {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid ID' }) };
+          }
+          const singleToken = requestHeaders.authorization?.replace('Bearer ', '');
+          const singleAuth = verifyAuth(singleToken, clientIP);
+          if (!singleAuth) {
+            return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) };
+          }
+          try {
+            const result = await pool.query('SELECT * FROM photos WHERE id = $1', [queryId]);
+            if (!result.rows[0]) {
+              return { statusCode: 404, headers, body: JSON.stringify({ error: 'Photo not found' }) };
+            }
+            const photo = { ...result.rows[0], displayUrl: getImageDataUrl(result.rows[0]) };
+            return { statusCode: 200, headers, body: JSON.stringify(photo) };
+          } catch (dbError) {
+            console.error(`[PHOTOS_DB_ERROR] ${new Date().toISOString()} - Single fetch error: ${dbError.message}`);
+            return { statusCode: 500, headers, body: JSON.stringify({ error: 'Database error' }) };
+          }
+        }
+
+        // Liste sans image_data — évite de dépasser la limite 6 MB de Netlify
         try {
           const result = await pool.query(
-            'SELECT * FROM photos ORDER BY category, created_at DESC'
+            `SELECT id, title, description, url, file_name, file_size, mime_type, category, media_type, created_at, updated_at,
+             (image_data IS NOT NULL) AS has_image
+             FROM photos ORDER BY category, created_at DESC`
           );
-          
-          // Convertir les données pour l'affichage
-          const photos = result.rows.map(photo => ({
-            ...photo,
-            displayUrl: getImageDataUrl(photo)
-          }));
-          
+          const photos = result.rows.map(photo => ({ ...photo, displayUrl: photo.url || null }));
           console.log(`[PHOTOS_ACCESS] ${new Date().toISOString()} - Public photos access from ${clientIP} (${photos.length} photos)`);
-          return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(photos)
-          };
+          return { statusCode: 200, headers, body: JSON.stringify(photos) };
         } catch (dbError) {
           console.error(`[PHOTOS_DB_ERROR] ${new Date().toISOString()} - Database error: ${dbError.message}`);
-          return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: 'Database error' })
-          };
+          return { statusCode: 500, headers, body: JSON.stringify({ error: 'Database error' }) };
         }
+      }
 
       case 'POST':
         // Créer une nouvelle photo (admin seulement)

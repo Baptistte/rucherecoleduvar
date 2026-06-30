@@ -633,9 +633,8 @@
                 }
             } else {
                 let imageUrl = '';
-                if (photo.displayUrl) imageUrl = photo.displayUrl;
-                else if (photo.url) imageUrl = photo.url;
-                else if (photo.image_data && photo.mime_type) imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
+                if (photo.url) imageUrl = photo.url;
+                else if (photo.has_image) imageUrl = `/.netlify/functions/photos?id=${photo.id}&serve=1`;
                 thumbHtml = imageUrl
                     ? `<img src="${imageUrl}" alt="${photo.title}" class="w-16 h-16 object-cover rounded border" onerror="this.style.display='none'">`
                     : `<div class="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center text-gray-500 text-xs">Pas d'image</div>`;
@@ -1110,8 +1109,7 @@
         };
 
         window.editPhoto = async (id) => {
-            const photos = await apiCall('/photos');
-            const photo = photos.find(p => p.id === id);
+            const photo = await apiCall(`/photos?id=${id}`);
 
             editingPhotoId = id;
 
@@ -1145,8 +1143,8 @@
                 document.getElementById('photoModalTitle').textContent = 'Modifier la vidéo';
             } else {
                 let imageUrl = '';
-                if (photo.image_data && photo.mime_type) imageUrl = `data:${photo.mime_type};base64,${photo.image_data}`;
-                else if (photo.url) imageUrl = photo.url;
+                if (photo.url) imageUrl = photo.url;
+                else if (photo.has_image) imageUrl = `/.netlify/functions/photos?id=${id}&serve=1`;
 
                 if (imageUrl) {
                     previewImg.src = imageUrl;
