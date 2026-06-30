@@ -290,9 +290,9 @@
                 photos = photos.map(photo => ({
                     ...photo,
                     mediaType: photo.media_type || 'image',
-                    displayUrl: photo.image_data
-                        ? `data:${photo.mime_type};base64,${photo.image_data}`
-                        : (photo.url || '')
+                    displayUrl: photo.url
+                        ? photo.url
+                        : (photo.has_image ? `/.netlify/functions/photos?id=${photo.id}&serve=1` : '')
                 }));
 
                 allPhotos = photos;
